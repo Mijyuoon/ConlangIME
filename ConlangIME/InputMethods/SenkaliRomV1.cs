@@ -14,7 +14,8 @@ namespace ConlangIME.InputMethods {
 
         static Dictionary<string, string> Substitute =
             new Dictionary<string, string> {
-                { "/", null }, { " ", "nspace" }, { "  ", "wspace" }, { "\n", "\n" },
+                { "/", null }, { "\n", "\n" },
+                { " ", "nspace" }, { "  ", "wspace" }, { ".", "period" }, { ",", "comma" },
 
                 { "eo", "ø" }, { "ö", "ø" }, { "iu", "y" }, { "ü", "y" },
                 { "x", "ʃ" }, { "š", "ʃ" }, { "j", "ʒ" }, { "ž", "ʒ" }, { "h", "x" },
@@ -23,7 +24,7 @@ namespace ConlangIME.InputMethods {
             };
         
         static Regex ScanRegex = new Regex(
-            @"((?>tc|[pbtdkgqfvszšxžjhçcmnlry])?(?>(?>eo|[aeoö])[iu]|(?>eo|iu|[aeoöiuü])(?>(?>[pkfsšxhmnlr]|t(?!c))(?![aeoöiuü]))?)|(?>tc|[pbtdkgqfvszšxžjhçcmnlry]))|( {1,2}|[\/\n])|.+?",
+            @"((?>tc|[pbtdkgqfvszšxžjhçcmnlry])?(?>(?>eo|[aeoö])[iu]|(?>eo|iu|[aeoöiuü])(?>(?>[pkfsšxhmnlr]|t(?!c))(?![aeoöiuü]))?)|(?>tc|[pbtdkgqfvszšxžjhçcmnlry]))|( {1,2}|[/\n.,])|([0-9XY])|.+?",
             RegexOptions.Compiled);
 
         static Regex SubstRegex = new Regex(
@@ -47,6 +48,11 @@ namespace ConlangIME.InputMethods {
                     if(tok != null) {
                         yield return Token.Sub(tok);
                     }
+
+                } else if(rm.Groups[3].Success) {
+
+                    string tok = rm.Groups[3].Value;
+                    yield return Token.Sub("num" + tok);
 
                 } else {
                     yield return Token.Raw(rm.Value);

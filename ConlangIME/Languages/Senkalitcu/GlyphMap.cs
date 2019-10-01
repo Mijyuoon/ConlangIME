@@ -692,8 +692,15 @@ namespace ConlangIME.Languages {
                 { "yx",   '\uE7F8' }, { "ym",   '\uE7F9' }, { "yn",   '\uE7FA' },
                 { "yl",   '\uE7FB' }, { "yr",   '\uE7FC' },
 
-                // Non-letter block
-                { "nspace", '\uE820' }, { "wspace", '\uE821' },
+                // Numeral block
+                { "num0", '\uE820' }, { "num1", '\uE821' }, { "num2", '\uE822' },
+                { "num3", '\uE823' }, { "num4", '\uE824' }, { "num5", '\uE825' },
+                { "num6", '\uE826' }, { "num7", '\uE827' }, { "num8", '\uE828' },
+                { "num9", '\uE829' }, { "numX", '\uE82A' }, { "numY", '\uE82B' },
+
+                // Punctuation block
+                { "nspace", '\uE830' }, { "wspace", '\uE831' }, { "period", '\uE832' },
+                { "comma",  '\uE833' },
 
                 // Kludges
                 { " ", ' ' }, { "\n", '\n' },
