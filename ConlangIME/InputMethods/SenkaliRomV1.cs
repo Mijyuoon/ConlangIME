@@ -16,18 +16,25 @@ namespace ConlangIME.InputMethods {
             new Dictionary<string, string> {
                 { "/", null }, { "\n", "\n" },
                 { " ", "nspace" }, { "  ", "wspace" }, { ".", "period" }, { ",", "comma" },
+                { "-",  "ndash" }, { "--",  "wdash" }, { "'",   "apos" }, { "’",  "apos" },
 
-                { "eo", "ø" }, { "ö", "ø" }, { "iu", "y" }, { "ü", "y" },
-                { "x", "ʃ" }, { "š", "ʃ" }, { "j", "ʒ" }, { "ž", "ʒ" }, { "h", "x" },
+                { "^", "stressmark" },
+
+                { "eo",  "ø" }, { "ö",  "ø" }, { "iu", "y" }, { "ü", "y" },
+                { "x",   "ʃ" }, { "š",  "ʃ" }, { "j",  "ʒ" }, { "ž", "ʒ" }, { "h", "x" },
                 { "tc", "ts" }, { "ç", "ts" }, { "c", "tʃ" },
-                { "y", "j" }, { "q", "ʔ" },
+                { "y",   "j" }, { "q",  "ʔ" },
             };
         
         static Regex ScanRegex = new Regex(
-            @"((?>tc|[pbtdkgqfvszšxžjhçcmnlry])?(?>(?>eo|[aeoö])[iu]|(?>eo|iu|[aeoöiuü])(?>(?>[pkfsšxhmnlr]|t(?!c))(?![aeoöiuü]))?)|(?>tc|[pbtdkgqfvszšxžjhçcmnlry]))|( {1,2}|[/\n.,])|([0-9XY])|.+?",
+            @"((?>tc|[pbtdkgqfvszšxžjhçcmnlry])?" +
+            @"(?>(?>eo|[aeoö])[iu]|(?>eo|iu|[aeoöiuü])" +
+            @"(?>(?>[pkfsšxhmnlr]|t(?!c))(?![aeoöiuü]))?)" +
+            @"|(?>tc|[pbtdkgqfvszšxžjhçcmnlry]))" +
+            @"|([ -]{1,2}|[/\n.,'’^])|([0-9XY])|.",
             RegexOptions.Compiled);
 
-        static Regex SubstRegex = new Regex(
+        static Regex RomIpaRegex = new Regex(
             @"eo|iu|tc|[öüxšjžhçcyq]",
             RegexOptions.Compiled);
 
@@ -35,8 +42,9 @@ namespace ConlangIME.InputMethods {
             foreach(Match rm in ScanRegex.Matches(input)) {
                 if(rm.Groups[1].Success) {
 
+
                     string tok = rm.Groups[1].Value;
-                    tok = SubstRegex.Replace(tok, x => Substitute[x.Value]);
+                    tok = RomIpaRegex.Replace(tok, x => Substitute[x.Value]);
 
                     yield return Token.Sub(tok);
 

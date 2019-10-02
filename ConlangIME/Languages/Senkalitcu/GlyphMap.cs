@@ -700,7 +700,9 @@ namespace ConlangIME.Languages {
 
                 // Punctuation block
                 { "nspace", '\uE830' }, { "wspace", '\uE831' }, { "period", '\uE832' },
-                { "comma",  '\uE833' },
+                { "comma",  '\uE833' }, { "ndash",  '\uE834' }, { "wdash",  '\uE835' },
+                { "apost",  '\uE836' }, { "lquot",  '\uE837' }, { "rquot",  '\uE838' },
+                { "stressmark", '\uE839' },
 
                 // Kludges
                 { " ", ' ' }, { "\n", '\n' },
