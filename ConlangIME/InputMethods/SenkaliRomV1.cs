@@ -17,6 +17,7 @@ namespace ConlangIME.InputMethods {
                 { "/", null }, { "\n", "\n" },
                 { " ", "nspace" }, { "  ", "wspace" }, { ".", "period" }, { ",", "comma" },
                 { "-",  "ndash" }, { "--",  "wdash" }, { "'",   "apos" }, { "’",  "apos" },
+                { "<",  "lquot" }, { "\"",  "rquot" }, { ">",  "rquot" },
 
                 { "^", "stressmark" },
 
@@ -31,7 +32,7 @@ namespace ConlangIME.InputMethods {
             @"(?>(?>eo|[aeoö])[iu]|(?>eo|iu|[aeoöiuü])" +
             @"(?>(?>[pkfsšxhmnlr]|t(?!c))(?![aeoöiuü]))?)" +
             @"|(?>tc|[pbtdkgqfvszšxžjhçcmnlry]))" +
-            @"|([ -]{1,2}|[/\n.,'’^])|([0-9XY])|.",
+            @"|(  ?|--?|[/\n.,'’^<>""])|([0-9XY])|.",
             RegexOptions.Compiled);
 
         static Regex RomIpaRegex = new Regex(
