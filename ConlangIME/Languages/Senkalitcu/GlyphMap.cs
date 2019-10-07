@@ -698,11 +698,16 @@ namespace ConlangIME.Languages {
                 { "num6", '\uE826' }, { "num7", '\uE827' }, { "num8", '\uE828' },
                 { "num9", '\uE829' }, { "numX", '\uE82A' }, { "numY", '\uE82B' },
 
-                // Punctuation block
+                // Punctuation and diacritic block
                 { "nspace", '\uE830' }, { "wspace", '\uE831' }, { "period", '\uE832' },
                 { "comma",  '\uE833' }, { "ndash",  '\uE834' }, { "wdash",  '\uE835' },
                 { "apost",  '\uE836' }, { "lquot",  '\uE837' }, { "rquot",  '\uE838' },
+
                 { "stressmark", '\uE839' },
+
+                // Logo-ideogram block
+                { "timestamp",   '\uE860' }, { "propername", '\uE861' },
+                { "affirmative", '\uE862' }, { "negative",   '\uE863' },
 
                 // Kludges
                 { " ", ' ' }, { "\n", '\n' },

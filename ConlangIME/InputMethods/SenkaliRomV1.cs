@@ -16,7 +16,7 @@ namespace ConlangIME.InputMethods {
             new Dictionary<string, string> {
                 { "/", null }, { "\n", "\n" },
                 { " ", "nspace" }, { "  ", "wspace" }, { ".", "period" }, { ",", "comma" },
-                { "-",  "ndash" }, { "--",  "wdash" }, { "'",   "apos" }, { "’",  "apos" },
+                { "-",  "ndash" }, { "--",  "wdash" }, { "'",  "apost" }, { "’", "apost" },
                 { "<",  "lquot" }, { "\"",  "rquot" }, { ">",  "rquot" },
 
                 { "^", "stressmark" },
@@ -25,6 +25,9 @@ namespace ConlangIME.InputMethods {
                 { "x",   "ʃ" }, { "š",  "ʃ" }, { "j",  "ʒ" }, { "ž", "ʒ" }, { "h", "x" },
                 { "tc", "ts" }, { "ç", "ts" }, { "c", "tʃ" },
                 { "y",   "j" }, { "q",  "ʔ" },
+
+                { "$time",  "timestamp" }, { "$name", "propername" },
+                { "$yes", "affirmative" }, { "$no",     "negative" },
             };
         
         static Regex ScanRegex = new Regex(
@@ -32,7 +35,8 @@ namespace ConlangIME.InputMethods {
             @"(?>(?>eo|[aeoö])[iu]|(?>eo|iu|[aeoöiuü])" +
             @"(?>(?>[pkfsšxhmnlr]|t(?!c))(?![aeoöiuü]))?)" +
             @"|(?>tc|[pbtdkgqfvszšxžjhçcmnlry]))" +
-            @"|(  ?|--?|[/\n.,'’^<>""])|([0-9XY])|.",
+            @"|(  ?|--?|[/\n.,'’^<>""]|\$\w+)" +
+            @"|([0-9XY])|.",
             RegexOptions.Compiled);
 
         static Regex RomIpaRegex = new Regex(
@@ -54,7 +58,7 @@ namespace ConlangIME.InputMethods {
                     string tok = rm.Groups[2].Value;
                     tok = Substitute.GetOrDefault(tok, tok);
 
-                    if(tok != null) {
+                    if(tok != null && tok[0] != '$') {
                         yield return Token.Sub(tok);
                     }
 
@@ -62,7 +66,7 @@ namespace ConlangIME.InputMethods {
 
                     string tok = rm.Groups[3].Value;
                     yield return Token.Sub("num" + tok);
-
+                
                 } else {
                     yield return Token.Raw(rm.Value);
                 }

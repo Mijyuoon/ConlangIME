@@ -13,17 +13,4 @@ namespace ConlangIME {
         public static V GetOrDefault<K, V>(this Dictionary<K, V> dict, K key) =>
             GetOrDefault(dict, key, default(V));
     }
-
-    public static class Utils {
-        public static IEnumerable<string[]> ReadTabulated(TextReader reader) {
-            while(true) {
-                var values = reader.ReadLine()?.Split('\t');
-                if(values == null) break;
-
-                yield return values;
-            }
-        }
-
-        public static IEnumerable<string[]> ReadTabulated(string input) => ReadTabulated(new StringReader(input));
-    }
 }
