@@ -28,11 +28,12 @@ namespace ConlangIME.InputMethods {
 
                 { "$time",  "timestamp" }, { "$name", "propername" },
                 { "$yes", "affirmative" }, { "$no",     "negative" },
+                { "$num",  "numbersign" },
             };
         
         static Regex ScanRegex = new Regex(
             @"((?>tc|[pbtdkgqfvszšxžjhçcmnlry])?" +
-            @"(?>(?>eo|[aeoö])[iu]|(?>eo|iu|[aeoöiuü])" +
+            @"(?>(?>eo|[aeoö])(?>iu|[iuü])|(?>eo|iu|[aeoöiuü])" +
             @"(?>(?>[pkfsšxhmnlr]|t(?!c))(?![aeoöiuü]))?)" +
             @"|(?>tc|[pbtdkgqfvszšxžjhçcmnlry]))" +
             @"|(  ?|--?|[/\n.,'’^<>""]|\$\w+)" +
