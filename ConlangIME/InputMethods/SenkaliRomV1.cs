@@ -26,9 +26,9 @@ namespace ConlangIME.InputMethods {
                 { "tc", "ts" }, { "ç", "ts" }, { "c", "tʃ" },
                 { "y",   "j" }, { "q",  "ʔ" },
 
-                { "$time",  "timestamp" }, { "$name", "propername" },
-                { "$yes", "affirmative" }, { "$no",     "negative" },
-                { "$num",  "numbersign" },
+                { "$time", "timestamp"   }, { "$name", "propername" },
+                { "$yes",  "affirmative" }, { "$no",   "negative"   },
+                { "$num",  "numbersign"  },
             };
         
         static Regex ScanRegex = new Regex(
