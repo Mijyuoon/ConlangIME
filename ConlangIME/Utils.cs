@@ -13,4 +13,9 @@ namespace ConlangIME {
         public static V GetOrDefault<K, V>(this Dictionary<K, V> dict, K key) =>
             GetOrDefault(dict, key, default(V));
     }
+
+    public static class Utils {
+        public static Dictionary<T, int> IndexMap<T>(IEnumerable<T> list) =>
+            list.Select((x, i) => new { k = x, v = i }).ToDictionary(x => x.k, x => x.v);
+    }
 }
