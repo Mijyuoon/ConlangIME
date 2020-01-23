@@ -106,8 +106,8 @@ namespace ConlangIME.InputMethods {
                 { 'q', 'č' },
                 { 'Q', 'Č' },
 
-                { '\u2000',  ' ' }, // EN QUAD
-                { '\u2002',  ' ' }, // EN SPACE
+                { '\u2000', ' '  }, // EN QUAD
+                { '\u2002', ' '  }, // EN SPACE
                 { '\u2001', '\t' }, // EM QUAD
                 { '\u2003', '\t' }, // EM SPACE
 
@@ -123,10 +123,10 @@ namespace ConlangIME.InputMethods {
                 { ('i', 'u'), 'ü' },
                 { ('I', 'U'), 'Ü' },
 
-                { (' ',   ' '), '\t' },
-                { ('-',   '-'),  '—' },
-                { ('\'', '\''),  '”' },
-                { ('`',   '`'),  '„' },
+                { (' ',  ' '),  '\t' },
+                { ('-',  '-'),  '—'  },
+                { ('\'', '\''), '”'  },
+                { ('`',  '`'),  '„'  },
             };
 
         static readonly Dictionary<char, string> Punctuation =
@@ -134,12 +134,12 @@ namespace ConlangIME.InputMethods {
                 { ' ',  "nspace" },
                 { '\t', "wspace" },
                 { '.',  "period" },
-                { ',',   "comma" },
-                { '-',   "ndash" },
-                { '—',   "wdash" },
-                { '’',   "apost" },
-                { '”',   "rquot" },
-                { '„',   "lquot" },
+                { ',',  "comma"  },
+                { '-',  "ndash"  },
+                { '—',  "wdash"  },
+                { '’',  "apost"  },
+                { '”',  "rquot"  },
+                { '„',  "lquot"  },
             };
 
         static readonly char[] DigitChars = new[] {
