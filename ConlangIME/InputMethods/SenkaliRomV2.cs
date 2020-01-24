@@ -95,6 +95,10 @@ namespace ConlangIME.InputMethods {
                 { '’',  CharT.Punc },
                 { '”',  CharT.Punc },
                 { '„',  CharT.Punc },
+
+                { '#', CharT.Punc },
+                { '@', CharT.Punc },
+                { '$', CharT.Punc },
             };
 
         static readonly Dictionary<char, char> SubSingle =
@@ -142,14 +146,30 @@ namespace ConlangIME.InputMethods {
                 { '„',  "lquot"  },
             };
 
-        static readonly char[] DigitChars = new[] {
-            '0', '1', '2', '3', '4', '5', '6', '7',
-            '8', '9', 'A', 'B', 'C', 'D', 'E', 'F',
-        };
+        static readonly Dictionary<string, string> Logograms =
+            new Dictionary<string, string> {
+                // Punctuation based
+                { "#", "num"  },
+                { "@", "name" },
+                { "$", "time" },
 
+                // Keyword based
+                { "y",   "yes" },
+                { "yes", "yes" },
+
+                { "n",  "no" },
+                { "no", "no" },
+            };
+
+        static readonly char LogogramStart = '\\';
+        static readonly HashSet<char> KeyChars = Utils.CharRanges("az", "AZ", "09");
+
+        static readonly string DigitChars = "0123456789ABCDEF";
         static readonly Dictionary<char, int> DigitVals = Utils.IndexMap(DigitChars);
 
         static readonly string[] ZeroNumber = new[] { "punc.ndash" };
+
+        static readonly HashSet<char> RawTokens = new HashSet<char>(" \t\n\r");
 
         private Token? ReadToken(StringReaderEx isr) {
             (char, CharT) ReadChar() {
@@ -227,8 +247,13 @@ namespace ConlangIME.InputMethods {
                 }
 
                 if((t0 & CharT.Punc) != 0) {
-                    string id = Punctuation[c0];
-                    output = Token.Sub($"punc.{id}");
+                    if(Punctuation.TryGetValue(c0, out var pnc)) {
+                        output = Token.Sub($"punc.{pnc}");
+                    } else {
+                        string log = Logograms[c0.ToString()];
+                        output = Token.Sub($"logo.{log}");
+                    }
+
                     return true;
                 }
 
@@ -273,6 +298,25 @@ namespace ConlangIME.InputMethods {
             NumBuf.Clear();
         }
 
+        private Token? ReadLogograph(StringReaderEx isr) {
+            Token? output = null;
+
+            isr.Backtrack(() => {
+                if(isr.Read() != LogogramStart) return false;
+
+                string key = isr.ReadWhile(ch => KeyChars.Contains(ch));
+                if(key.Length == 0) return false;
+
+                if(Logograms.TryGetValue(key.ToLower(), out var ltok)) {
+                    output = Token.Sub($"logo.{ltok}");
+                }
+
+                return true;
+            });
+
+            return output;
+        }
+
         public IEnumerable<Token> Tokenize(string input) {
             var isr = new StringReaderEx(input);
 
@@ -288,6 +332,17 @@ namespace ConlangIME.InputMethods {
                     gotnum = true;
                 }
                 if(gotnum) continue;
+
+                if(ReadLogograph(isr) is Token ltok) {
+                    yield return ltok;
+                    continue;
+                }
+
+                string raw = isr.ReadWhile(ch => RawTokens.Contains(ch));
+                if(raw.Length > 0) {
+                    yield return Token.Raw(raw);
+                    continue;
+                }
 
                 isr.Advance(1);
             }

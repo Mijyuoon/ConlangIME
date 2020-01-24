@@ -39,17 +39,32 @@ namespace ConlangIME {
 
         public char Read() {
             char ch = Peek(1);
-            Advance(1);
+            Position += 1;
             return ch;
         }
 
         public string Read(int n) {
             int len = Math.Min(n, length - offset);
             string s = buffer.Substring(offset, len);
-            Advance(len);
+            Position += len;
             return s;
         }
-        
+
+        public string ReadWhile(Func<char, bool> func) {
+            int npos = offset;
+
+            while(npos < length) {
+                char ch = buffer[npos];
+                if(!func(ch)) break;
+                npos++;
+            }
+
+            int len = Math.Min(npos, length) - offset;
+            string s = buffer.Substring(offset, len);
+            Position += len;
+            return s;
+        }
+
         public bool Backtrack(Func<bool> func) {
             int old = offset;
             bool keep = false;

@@ -19,6 +19,7 @@ namespace ConlangIME.Languages {
         const int IsolBase = 0xE220;
         const int NumsBase = 0xE240;
         const int PuncBase = 0xE250;
+        const int LogoBase = 0xE280;
 
         static readonly Dictionary<char, int> Final1Map = Utils.IndexMap("aeoöiuü");
         static readonly Dictionary<char, int> Final2Map = Utils.IndexMap("-iuümnlrfsšhptk");
@@ -31,6 +32,10 @@ namespace ConlangIME.Languages {
 
         static readonly Dictionary<string, int> PuncMap = Utils.IndexMap(new[] {
             "nspace", "wspace", "period", "comma", "ndash", "wdash", "apost", "lquot", "rquot"
+        });
+
+        static readonly Dictionary<string, int> LogoMap = Utils.IndexMap(new[] {
+            "num", "name", "time", "yes", "no",
         });
 
         public string Process(IEnumerable<Token> tokens) {
@@ -66,15 +71,17 @@ namespace ConlangIME.Languages {
                         c = (char)(PuncBase + PuncMap[par1]);
                         break;
 
+                    case "logo":
+                        c = (char)(LogoBase + LogoMap[par1]);
+                        break;
+
                     default:
                         throw new FormatException("invalid token type");
                     }
 
                     sb.Append(c);
                 } else {
-                    sb.Append('⟨');
                     sb.Append(tk.Value);
-                    sb.Append('⟩');
                 }
             }
 
