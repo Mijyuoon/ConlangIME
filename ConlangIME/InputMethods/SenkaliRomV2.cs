@@ -122,10 +122,10 @@ namespace ConlangIME.InputMethods {
 
         static readonly Dictionary<(char, char), char> SubDigraph =
             new Dictionary<(char, char), char> {
-                { ('e', 'o'), 'ö' },
-                { ('E', 'O'), 'Ö' },
-                { ('i', 'u'), 'ü' },
-                { ('I', 'U'), 'Ü' },
+                { ('e', 'w'), 'ö' },
+                { ('E', 'W'), 'Ö' },
+                { ('i', 'w'), 'ü' },
+                { ('I', 'W'), 'Ü' },
 
                 { (' ',  ' '),  '\t' },
                 { ('-',  '-'),  '—'  },
