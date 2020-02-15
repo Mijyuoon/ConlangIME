@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:ConlangIME"
+        xmlns:gui="clr-namespace:ConlangIME.GUI"
         mc:Ignorable="d"
         Title="Mijyuoon's Conlang IME"
         WindowStartupLocation="CenterScreen"
@@ -41,6 +42,12 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
+
+            <TextBlock Margin="0,0,5,0" Text="Font scale:"/>
+
+            <gui:NumSpinner Margin="0,0,5,0" MinWidth="80" Suffix="%"
+                            MinValue="50" MaxValue="200" Step="10"
+                            Value="{Binding FontScale}"/>
         </StackPanel>
 
         <TextBox Grid.Row="1" AcceptsReturn="True"
@@ -53,6 +60,6 @@
                  VerticalScrollBarVisibility="Auto"
                  Text="{Binding OutputText, Mode=TwoWay}"
                  FontFamily="{Binding CurrentLanguage.Font}"
-                 FontSize="{Binding CurrentLanguage.FontSize}"/>
+                 FontSize="{Binding ScaledFontSize}"/>
     </Grid>
 </Window>

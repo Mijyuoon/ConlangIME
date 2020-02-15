@@ -66,12 +66,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="GUI\NumSpinner.xaml.cs">
+      <DependentUpon>NumSpinner.xaml</DependentUpon>
+    </Compile>
     <Compile Include="InputMethods\SenkaliRomV1.cs" />
     <Compile Include="InputMethods\SenkaliRomV2.cs" />
     <Compile Include="Languages\SenkalicuV2.cs" />
     <Compile Include="Languages\Senkalitcu\GlyphMap.cs" />
     <Compile Include="StringReaderEx.cs" />
     <Compile Include="Utils.cs" />
+    <Page Include="GUI\NumSpinner.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

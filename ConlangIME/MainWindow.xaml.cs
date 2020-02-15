@@ -1,5 +1,4 @@
-﻿using Mijyuoon.MVVM;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -15,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Mijyuoon.MVVM;
 
 namespace ConlangIME {
     /// <summary>
@@ -34,7 +34,10 @@ namespace ConlangIME {
             private ILanguage _CurrentLanguage;
             public ILanguage CurrentLanguage {
                 get => _CurrentLanguage;
-                set => SetProperty(ref _CurrentLanguage, value);
+                set {
+                    SetProperty(ref _CurrentLanguage, value);
+                    OnPropertyChanged(nameof(ScaledFontSize));
+                }
             }
 
             private List<IInputMethod> _InputMethods;
@@ -48,6 +51,18 @@ namespace ConlangIME {
                 get => _CurrentInputMethod;
                 set => SetProperty(ref _CurrentInputMethod, value);
             }
+
+            private int _FontScale;
+            public int FontScale {
+                get => _FontScale;
+                set {
+                    SetProperty(ref _FontScale, value);
+                    OnPropertyChanged(nameof(ScaledFontSize));
+                }
+            }
+
+            public double ScaledFontSize =>
+                (CurrentLanguage?.FontSize ?? 0) * FontScale * 0.01;
 
             private string _InputText;
             public string InputText {
@@ -75,6 +90,7 @@ namespace ConlangIME {
             VM = new ViewModel();
             VM.PropertyChanged += VM_PropertyChanged;
             VM.Languages = Languages;
+            VM.FontScale = 100;
 
             InitializeComponent();
             DataContext = VM;
