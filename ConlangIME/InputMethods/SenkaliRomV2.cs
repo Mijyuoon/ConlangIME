@@ -95,6 +95,7 @@ namespace ConlangIME.InputMethods {
                 { '’',  CharT.Punc },
                 { '”',  CharT.Punc },
                 { '„',  CharT.Punc },
+                { '|',  CharT.Punc },
 
                 { '#', CharT.Punc },
                 { '@', CharT.Punc },
@@ -144,6 +145,8 @@ namespace ConlangIME.InputMethods {
                 { '’',  "apost"  },
                 { '”',  "rquot"  },
                 { '„',  "lquot"  },
+
+                { '|',  "parstart" },
             };
 
         static readonly Dictionary<string, string> Logograms =

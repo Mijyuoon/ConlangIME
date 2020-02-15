@@ -31,7 +31,8 @@ namespace ConlangIME.Languages {
         static readonly Dictionary<char, int> NumsMap = Utils.IndexMap("0123456789ABCDEF");
 
         static readonly Dictionary<string, int> PuncMap = Utils.IndexMap(new[] {
-            "nspace", "wspace", "period", "comma", "ndash", "wdash", "apost", "lquot", "rquot"
+            "nspace", "wspace", "period", "comma", "ndash", "wdash", "apost", "lquot", "rquot",
+            "parstart",
         });
 
         static readonly Dictionary<string, int> LogoMap = Utils.IndexMap(new[] {
