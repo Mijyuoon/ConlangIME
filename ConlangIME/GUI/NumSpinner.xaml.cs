@@ -79,6 +79,9 @@ namespace ConlangIME.GUI {
         }
 
         private static void Value_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
+            d.CoerceValue(MinValueProperty);
+            d.CoerceValue(MaxValueProperty);
+
             var sender = d as NumSpinner;
             sender.txField.Text = $"{e.NewValue}{sender.Suffix}";
         }
@@ -109,11 +112,15 @@ namespace ConlangIME.GUI {
         }
 
         private void Minus_Click(object sender, RoutedEventArgs e) {
-            Value -= Step;
+            if(Value > MinValue) {
+                Value -= Step;
+            }
         }
 
         private void Plus_Click(object sender, RoutedEventArgs e) {
-            Value += Step;
+            if(Value < MaxValue) {
+                Value += Step;
+            }
         }
 
         #endregion
