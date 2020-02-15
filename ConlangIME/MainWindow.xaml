@@ -19,7 +19,8 @@
         </Grid.RowDefinitions>
 
         <StackPanel Grid.Row="0" Margin="0,0,0,5" Orientation="Horizontal">
-            <TextBlock Margin="0,0,5,0" Text="Language:"/>
+            <TextBlock Margin="0,0,5,0" Text="Language:"
+                       VerticalAlignment="Center"/>
             
             <ComboBox Margin="0,0,5,0" MinWidth="100"
                       ItemsSource="{Binding Languages}"
@@ -30,8 +31,9 @@
                     </DataTemplate>
                 </ComboBox.ItemTemplate>
             </ComboBox>
-            
-            <TextBlock Margin="0,0,5,0" Text="Input mode:"/>
+
+            <TextBlock Margin="0,0,5,0" Text="Input mode:"
+                       VerticalAlignment="Center"/>
             
             <ComboBox Margin="0,0,5,0" MinWidth="100"
                       ItemsSource="{Binding InputMethods}"
@@ -43,7 +45,8 @@
                 </ComboBox.ItemTemplate>
             </ComboBox>
 
-            <TextBlock Margin="0,0,5,0" Text="Font scale:"/>
+            <TextBlock Margin="0,0,5,0" Text="Font scale:"
+                       VerticalAlignment="Center"/>
 
             <gui:NumSpinner Margin="0,0,5,0" MinWidth="80" Suffix="%"
                             MinValue="50" MaxValue="200" Step="10"
