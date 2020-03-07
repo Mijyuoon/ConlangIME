@@ -150,5 +150,10 @@ namespace ConlangIME {
                 }
             }
         }
+
+        private void CopyUnicode_Click(object sender, RoutedEventArgs e) {
+            var codes = VM.OutputText.AsCodePoints().Select(x => x.ToString("X4"));
+            Clipboard.SetText(String.Join(" ", codes));
+        }
     }
 }

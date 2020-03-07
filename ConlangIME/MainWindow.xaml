@@ -65,6 +65,12 @@
                  VerticalScrollBarVisibility="Auto"
                  Text="{Binding OutputText, Mode=TwoWay}"
                  FontFamily="{Binding CurrentLanguage.Font}"
-                 FontSize="{Binding ScaledFontSize}"/>
+                 FontSize="{Binding ScaledFontSize}">
+            <TextBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy Unicode Codepoints" Click="CopyUnicode_Click"/>
+                </ContextMenu>
+            </TextBox.ContextMenu>
+        </TextBox>
     </Grid>
 </Window>

@@ -12,6 +12,13 @@ namespace ConlangIME {
 
         public static V GetOrDefault<K, V>(this Dictionary<K, V> dict, K key) =>
             GetOrDefault(dict, key, default(V));
+
+        public static IEnumerable<int> AsCodePoints(this string str) {
+            for(int i = 0; i < str.Length; i++) {
+                yield return Char.ConvertToUtf32(str, i);
+                if(Char.IsSurrogatePair(str, i)) i++;
+            }
+        }
     }
 
     public static class Utils {
