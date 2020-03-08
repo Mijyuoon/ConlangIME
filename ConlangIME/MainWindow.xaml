@@ -68,7 +68,14 @@
                  FontSize="{Binding ScaledFontSize}">
             <TextBox.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Copy Unicode Codepoints" Click="CopyUnicode_Click"/>
+                    <MenuItem Header="Copy Unicode Codepoints">
+                        <MenuItem Header="Single Line"
+                                  Click="CopyUnicode_Click" Tag="0"/>
+                        <MenuItem Header="Chunked (8)"
+                                  Click="CopyUnicode_Click" Tag="8"/>
+                        <MenuItem Header="Chunked (16)"
+                                  Click="CopyUnicode_Click" Tag="16"/>
+                    </MenuItem>
                 </ContextMenu>
             </TextBox.ContextMenu>
         </TextBox>
