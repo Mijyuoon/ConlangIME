@@ -75,6 +75,8 @@
                                   Click="CopyUnicode_Click" Tag="8"/>
                         <MenuItem Header="Chunked (16)"
                                   Click="CopyUnicode_Click" Tag="16"/>
+                        <MenuItem Header="Chunked (24)"
+                                  Click="CopyUnicode_Click" Tag="24"/>
                     </MenuItem>
                 </ContextMenu>
             </TextBox.ContextMenu>
