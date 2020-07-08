@@ -126,15 +126,15 @@ namespace ConlangIME.InputMethods {
 
         static readonly Dictionary<(char, char), char> SubDigraph =
             new Dictionary<(char, char), char> {
-                { ('e', 'w'), 'ö' },
-                { ('E', 'W'), 'Ö' },
-                { ('i', 'w'), 'ü' },
-                { ('I', 'W'), 'Ü' },
+                { ('e', 'o'), 'ö' },
+                { ('E', 'O'), 'Ö' },
+                { ('i', 'u'), 'ü' },
+                { ('I', 'U'), 'Ü' },
                 
-                { (' ',  ' '),  '\t' },
-                { ('-',  '-'),  '—'  },
+                { (' ',  ' ' ), '\t' },
+                { ('-',  '-' ), '—'  },
                 { ('\'', '\''), '”'  },
-                { ('`',  '`'),  '„'  },
+                { ('`',  '`' ), '„'  },
             };
 
         static readonly Dictionary<char, string> Punctuation =
