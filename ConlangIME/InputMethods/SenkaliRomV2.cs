@@ -16,14 +16,17 @@ namespace ConlangIME.InputMethods {
         [Flags]
         enum CharT {
             Null = 0,
-            Cons = 1 << 0,
-            Vowel = 1 << 1,
-            Final = 1 << 2,
-            Term = 1 << 3,
-            Isol = 1 << 4,
-            Punc = 1 << 5,
 
-            Syll = Cons | Vowel,
+            Cons  = 1 << 0, // Consonant (onset) token
+            Vowel = 1 << 1, // Vowel (final) token
+
+            Coda  = 1 << 2, // Coda (final) token
+            Final = 1 << 3, // Word-final coda
+
+            Isol = 1 << 4, // Isolated token
+            Punc = 1 << 5, // Punctuation token
+
+            Syll = Cons | Vowel, // Syllable component
         }
 
         static readonly Dictionary<char, CharT> CharTypes =
@@ -32,29 +35,29 @@ namespace ConlangIME.InputMethods {
                 { 'e', CharT.Vowel },
                 { 'o', CharT.Vowel },
                 { 'ö', CharT.Vowel },
-                { 'i', CharT.Vowel | CharT.Final },
-                { 'u', CharT.Vowel | CharT.Final },
-                { 'ü', CharT.Vowel | CharT.Final },
+                { 'i', CharT.Vowel | CharT.Coda },
+                { 'u', CharT.Vowel | CharT.Coda },
+                { 'ü', CharT.Vowel | CharT.Coda },
 
-                { 'p', CharT.Cons | CharT.Term },
+                { 'p', CharT.Cons | CharT.Final },
                 { 'b', CharT.Cons },
-                { 't', CharT.Cons | CharT.Term },
+                { 't', CharT.Cons | CharT.Final },
                 { 'd', CharT.Cons },
-                { 'k', CharT.Cons | CharT.Term },
+                { 'k', CharT.Cons | CharT.Final },
                 { 'g', CharT.Cons },
-                { 'f', CharT.Cons | CharT.Term },
+                { 'f', CharT.Cons | CharT.Final },
                 { 'v', CharT.Cons },
-                { 's', CharT.Cons | CharT.Term },
+                { 's', CharT.Cons | CharT.Final },
                 { 'z', CharT.Cons },
-                { 'š', CharT.Cons | CharT.Term },
+                { 'š', CharT.Cons | CharT.Final },
                 { 'ž', CharT.Cons },
-                { 'h', CharT.Cons | CharT.Term },
+                { 'h', CharT.Cons | CharT.Final },
                 { 'c', CharT.Cons },
                 { 'č', CharT.Cons },
-                { 'm', CharT.Cons | CharT.Final },
-                { 'n', CharT.Cons | CharT.Final },
-                { 'l', CharT.Cons | CharT.Final },
-                { 'r', CharT.Cons | CharT.Final },
+                { 'm', CharT.Cons | CharT.Coda },
+                { 'n', CharT.Cons | CharT.Coda },
+                { 'l', CharT.Cons | CharT.Coda },
+                { 'r', CharT.Cons | CharT.Coda },
                 { 'y', CharT.Cons },
 
                 { 'A', CharT.Isol },
@@ -127,7 +130,7 @@ namespace ConlangIME.InputMethods {
                 { ('E', 'W'), 'Ö' },
                 { ('i', 'w'), 'ü' },
                 { ('I', 'W'), 'Ü' },
-
+                
                 { (' ',  ' '),  '\t' },
                 { ('-',  '-'),  '—'  },
                 { ('\'', '\''), '”'  },
@@ -157,11 +160,15 @@ namespace ConlangIME.InputMethods {
                 { "$", "time" },
 
                 // Keyword based
-                { "y",   "yes" },
-                { "yes", "yes" },
+                { "num",  "num"  },
+                { "name", "name" },
+                { "time", "time" },
 
-                { "n",  "no" },
-                { "no", "no" },
+                { "y", "yes" },
+                { "n", "no"  },
+
+                { "yes", "yes" },
+                { "no",  "no"  },
             };
 
         static readonly char LogogramStart = '\\';
@@ -224,14 +231,14 @@ namespace ConlangIME.InputMethods {
                         var (c1, t1) = ReadChar();
                         var (c2, t2) = PeekChar(1);
 
-                        if((t1 & CharT.Final) != 0) {
+                        if((t1 & CharT.Coda) != 0) {
                             if((t1 & CharT.Cons) != 0 && (t2 & CharT.Vowel) != 0) return false;
-                            if((t1 & CharT.Vowel) != 0 && (t0 & CharT.Final) != 0) return false;
+                            if((t1 & CharT.Vowel) != 0 && (t0 & CharT.Coda) != 0) return false;
                             tok += c1;
                             return true;
                         }
 
-                        if((t1 & CharT.Term) != 0 && (t2 & CharT.Syll) == 0) {
+                        if((t1 & CharT.Final) != 0 && (t2 & CharT.Syll) == 0) {
                             tok += c1;
                             return true;
                         }
@@ -274,13 +281,14 @@ namespace ConlangIME.InputMethods {
                 NumBuf.Add(dig);
             }
 
-            if(NumBuf.Count == 0) yield break;
+            if(NumBuf.Count == 0) return null;
 
             if(NumBuf.Sum() == 0) {
-                foreach(var tok in ZeroNumber) {
-                    yield return Token.Sub(tok);
-                }
-            } else {
+                NumBuf.Clear();
+                return ZeroNumber.Select(Token.Sub);
+            }
+
+            IEnumerable<Token> Generator() {
                 int nbase = DigitChars.Length;
                 int first = NumBuf.FindIndex(x => x > 0);
 
@@ -296,9 +304,11 @@ namespace ConlangIME.InputMethods {
                     char ch = DigitChars[NumBuf[i] % nbase];
                     yield return Token.Sub($"num.{ch}");
                 }
+
+                NumBuf.Clear();
             }
 
-            NumBuf.Clear();
+            return Generator();
         }
 
         private Token? ReadLogograph(StringReaderEx isr) {
@@ -329,12 +339,11 @@ namespace ConlangIME.InputMethods {
                     continue;
                 }
 
-                bool gotnum = false;
-                foreach(var ntok in ReadNumber(isr)) {
-                    yield return ntok;
-                    gotnum = true;
+                if(ReadNumber(isr) is IEnumerable<Token> ntoks) {
+                    foreach(var ntok in ntoks)
+                        yield return ntok;
+                    continue;
                 }
-                if(gotnum) continue;
 
                 if(ReadLogograph(isr) is Token ltok) {
                     yield return ltok;

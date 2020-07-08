@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace ConlangIME {
     public static class ExtensionUtils {
-        public static V GetOrDefault<K, V>(this Dictionary<K, V> dict, K key, V defaultVal) =>
-            dict.TryGetValue(key, out var value) ? value : defaultVal;
+        public static V GetOrDefault<K, V>(this Dictionary<K, V> dict, K key, V defaultValue) =>
+            dict.TryGetValue(key, out var value) ? value : defaultValue;
 
         public static V GetOrDefault<K, V>(this Dictionary<K, V> dict, K key) =>
-            GetOrDefault(dict, key, default(V));
+            dict.TryGetValue(key, out var value) ? value : default(V);
 
         public static IEnumerable<int> AsCodePoints(this string str) {
             for(int i = 0; i < str.Length; i++) {
@@ -23,7 +23,9 @@ namespace ConlangIME {
 
     public static class Utils {
         public static Dictionary<T, int> IndexMap<T>(IEnumerable<T> list) =>
-            list.Select((x, i) => new { k = x, v = i }).ToDictionary(x => x.k, x => x.v);
+            list.Select((x, i) => new { k = x, v = i })
+                .Where(x => x.k != null)
+                .ToDictionary(x => x.k, x => x.v);
 
         public static HashSet<char> CharRanges(params string[] args) {
             IEnumerable<char> MapRange(string arg) {
