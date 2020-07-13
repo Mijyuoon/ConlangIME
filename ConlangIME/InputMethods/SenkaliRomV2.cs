@@ -20,17 +20,22 @@ namespace ConlangIME.InputMethods {
             Cons  = 1 << 0, // Consonant (onset) token
             Vowel = 1 << 1, // Vowel (final) token
 
-            Coda  = 1 << 2, // Coda (final) token
-            Final = 1 << 3, // Word-final coda
+            Isol = 1 << 1, // Isolated token
+            Punc = 1 << 3, // Punctuation token
 
-            Isol = 1 << 4, // Isolated token
-            Punc = 1 << 5, // Punctuation token
+            Coda = 1 << 4, // Coda (final) token
+            Final = 1 << 5, // Word-final coda
+            
+            AuxTone = 1 << 6, // Marks pitch accent
 
             Syll = Cons | Vowel, // Syllable component
         }
 
+        #region Data Constants
+
         static readonly Dictionary<char, CharT> CharTypes =
             new Dictionary<char, CharT> {
+                // Vowel letters
                 { 'a', CharT.Vowel },
                 { 'e', CharT.Vowel },
                 { 'o', CharT.Vowel },
@@ -39,6 +44,25 @@ namespace ConlangIME.InputMethods {
                 { 'u', CharT.Vowel | CharT.Coda },
                 { 'ü', CharT.Vowel | CharT.Coda },
 
+                // Vowel letters w/ accent #1
+                { 'á', CharT.Vowel | CharT.AuxTone },
+                { 'é', CharT.Vowel | CharT.AuxTone },
+                { 'ó', CharT.Vowel | CharT.AuxTone },
+                { 'ő', CharT.Vowel | CharT.AuxTone },
+                { 'í', CharT.Vowel | CharT.AuxTone },
+                { 'ú', CharT.Vowel | CharT.AuxTone },
+                { 'ű', CharT.Vowel | CharT.AuxTone },
+
+                // Vowel letters w/ accent #2
+                { 'à', CharT.Vowel | CharT.AuxTone },
+                { 'è', CharT.Vowel | CharT.AuxTone },
+                { 'ò', CharT.Vowel | CharT.AuxTone },
+                { 'ȍ', CharT.Vowel | CharT.AuxTone },
+                { 'ì', CharT.Vowel | CharT.AuxTone },
+                { 'ù', CharT.Vowel | CharT.AuxTone },
+                { 'ȕ', CharT.Vowel | CharT.AuxTone },
+
+                // Consonant letters
                 { 'p', CharT.Cons | CharT.Final },
                 { 'b', CharT.Cons },
                 { 't', CharT.Cons | CharT.Final },
@@ -60,6 +84,7 @@ namespace ConlangIME.InputMethods {
                 { 'r', CharT.Cons | CharT.Coda },
                 { 'y', CharT.Cons },
 
+                // Isolate letters
                 { 'A', CharT.Isol },
                 { 'E', CharT.Isol },
                 { 'O', CharT.Isol },
@@ -89,6 +114,7 @@ namespace ConlangIME.InputMethods {
                 { 'R', CharT.Isol },
                 { 'Y', CharT.Isol },
 
+                // Basic punctuation
                 { ' ',  CharT.Punc },
                 { '\t', CharT.Punc },
                 { '.',  CharT.Punc },
@@ -98,8 +124,15 @@ namespace ConlangIME.InputMethods {
                 { '’',  CharT.Punc },
                 { '”',  CharT.Punc },
                 { '„',  CharT.Punc },
+
+                // Extended punctuation
                 { '|',  CharT.Punc },
 
+                // Diacritics
+                { '¹',  CharT.Punc },
+                { '²',  CharT.Punc },
+
+                // Punctiation-like logographs
                 { '#', CharT.Punc },
                 { '@', CharT.Punc },
                 { '$', CharT.Punc },
@@ -107,6 +140,7 @@ namespace ConlangIME.InputMethods {
 
         static readonly Dictionary<char, char> SubSingle =
             new Dictionary<char, char> {
+                // Letters
                 { 'x', 'š' },
                 { 'X', 'Š' },
                 { 'j', 'ž' },
@@ -114,11 +148,13 @@ namespace ConlangIME.InputMethods {
                 { 'q', 'č' },
                 { 'Q', 'Č' },
 
+                // Whitespace
                 { '\u2000', ' '  }, // EN QUAD
                 { '\u2002', ' '  }, // EN SPACE
                 { '\u2001', '\t' }, // EM QUAD
                 { '\u2003', '\t' }, // EM SPACE
 
+                // Punctuation
                 { '–',  '-' },
                 { '\'', '’' },
                 { '"',  '”' },
@@ -126,19 +162,26 @@ namespace ConlangIME.InputMethods {
 
         static readonly Dictionary<(char, char), char> SubDigraph =
             new Dictionary<(char, char), char> {
+                // Letters
                 { ('e', 'o'), 'ö' },
                 { ('E', 'O'), 'Ö' },
                 { ('i', 'u'), 'ü' },
                 { ('I', 'U'), 'Ü' },
                 
+                // Punctuation
                 { (' ',  ' ' ), '\t' },
                 { ('-',  '-' ), '—'  },
                 { ('\'', '\''), '”'  },
                 { ('`',  '`' ), '„'  },
+
+                // Pitch accent marks
+                { ('^', '1'), '¹' },
+                { ('^', '2'), '²' },
             };
 
         static readonly Dictionary<char, string> Punctuation =
             new Dictionary<char, string> {
+                // Base punctuation
                 { ' ',  "nspace" },
                 { '\t', "wspace" },
                 { '.',  "period" },
@@ -149,7 +192,12 @@ namespace ConlangIME.InputMethods {
                 { '”',  "rquot"  },
                 { '„',  "lquot"  },
 
+                // Extended punctuation
                 { '|',  "parstart" },
+
+                // Pitch accent marks
+                { '¹', "tone1" },
+                { '²', "tone2" },
             };
 
         static readonly Dictionary<string, string> Logograms =
@@ -171,15 +219,41 @@ namespace ConlangIME.InputMethods {
                 { "no",  "no"  },
             };
 
+
         static readonly char LogogramStart = '\\';
         static readonly HashSet<char> KeyChars = Utils.CharRanges("az", "AZ", "09");
 
         static readonly string DigitChars = "0123456789ABCDEF";
         static readonly Dictionary<char, int> DigitVals = Utils.IndexMap(DigitChars);
 
-        static readonly string[] ZeroNumber = new[] { "punc.ndash" };
-
         static readonly HashSet<char> RawTokens = new HashSet<char>(" \t\n\r");
+
+
+        static readonly IEnumerable<string> ZeroNumber =
+            new string[] {
+                "punc.ndash",
+            };
+
+        static readonly Dictionary<char, string> ToneMarkers =
+            new Dictionary<char, string> {
+                { '\u0301', "punc.tone1" }, // COMBINING ACUTE ACCENT
+                { '\u030b', "punc.tone1" }, // COMBINING DOUBLE ACUTE ACCENT
+                { '\u0300', "punc.tone2" }, // COMBINING GRAVE ACCENT
+                { '\u030f', "punc.tone2" }, // COMBINING DOUBLE GRAVE ACCENT
+            };
+
+        #endregion
+
+        private Queue<Token> AuxTokens = new Queue<Token>(16);
+
+        private void AuxExtractTone(ref char input) {
+            var decomp = input.ToString().Normalize(NormalizationForm.FormD);
+            if(decomp.Length != 2) throw new ArgumentException();
+
+            var tone = ToneMarkers[decomp[1]];
+            AuxTokens.Enqueue(Token.Sub(tone));
+            input = decomp[0];
+        }
 
         private Token? ReadToken(StringReaderEx isr) {
             (char, CharT) ReadChar() {
@@ -225,6 +299,10 @@ namespace ConlangIME.InputMethods {
                 }
 
                 if((t0 & CharT.Vowel) != 0) {
+                    if((t0 & CharT.AuxTone) != 0) {
+                        AuxExtractTone(ref c0);
+                    }
+
                     string tok = $"final.{c0}";
 
                     isr.Backtrack(() => {
@@ -276,6 +354,8 @@ namespace ConlangIME.InputMethods {
         private List<int> NumBuf = new List<int>(32);
 
         private IEnumerable<Token> ReadNumber(StringReaderEx isr) {
+            NumBuf.Clear();
+
             while(DigitVals.TryGetValue(isr.Peek(1), out var dig)) {
                 isr.Advance(1);
                 NumBuf.Add(dig);
@@ -284,7 +364,6 @@ namespace ConlangIME.InputMethods {
             if(NumBuf.Count == 0) return null;
 
             if(NumBuf.Sum() == 0) {
-                NumBuf.Clear();
                 return ZeroNumber.Select(Token.Sub);
             }
 
@@ -304,8 +383,6 @@ namespace ConlangIME.InputMethods {
                     char ch = DigitChars[NumBuf[i] % nbase];
                     yield return Token.Sub($"num.{ch}");
                 }
-
-                NumBuf.Clear();
             }
 
             return Generator();
@@ -334,6 +411,10 @@ namespace ConlangIME.InputMethods {
             var isr = new StringReaderEx(input);
 
             while(!isr.IsEOF) {
+                while(AuxTokens.Count > 0) {
+                    yield return AuxTokens.Dequeue();
+                }
+
                 if(ReadToken(isr) is Token tok) {
                     yield return tok;
                     continue;
@@ -357,6 +438,10 @@ namespace ConlangIME.InputMethods {
                 }
 
                 isr.Advance(1);
+            }
+
+            while(AuxTokens.Count > 0) {
+                yield return AuxTokens.Dequeue();
             }
         }
     }

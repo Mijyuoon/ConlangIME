@@ -32,7 +32,7 @@ namespace ConlangIME.Languages {
 
         static readonly Dictionary<string, int> PuncMap = Utils.IndexMap(new[] {
             "nspace", "wspace", "period", "comma", "ndash", "wdash", "apost", "lquot",
-            "rquot", "parstart",
+            "rquot", "parstart", null, null, null, null, "tone2", "tone1",
         });
 
         static readonly Dictionary<string, int> LogoMap = Utils.IndexMap(new[] {
