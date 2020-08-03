@@ -20,7 +20,7 @@ namespace ConlangIME.InputMethods {
             Cons  = 1 << 0, // Consonant (onset) token
             Vowel = 1 << 1, // Vowel (final) token
 
-            Isol = 1 << 1, // Isolated token
+            Isol = 1 << 2, // Isolated token
             Punc = 1 << 3, // Punctuation token
 
             Coda = 1 << 4, // Coda (final) token
