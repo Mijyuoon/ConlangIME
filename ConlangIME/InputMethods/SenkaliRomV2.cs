@@ -167,7 +167,7 @@ namespace ConlangIME.InputMethods {
                 { ('E', 'O'), 'Ö' },
                 { ('i', 'u'), 'ü' },
                 { ('I', 'U'), 'Ü' },
-                
+
                 // Punctuation
                 { (' ',  ' ' ), '\t' },
                 { ('-',  '-' ), '—'  },
@@ -223,16 +223,13 @@ namespace ConlangIME.InputMethods {
         static readonly char LogogramStart = '\\';
         static readonly HashSet<char> KeyChars = Utils.CharRanges("az", "AZ", "09");
 
-        static readonly string DigitChars = "0123456789ABCDEF";
-        static readonly Dictionary<char, int> DigitVals = Utils.IndexMap(DigitChars);
+        static readonly string DigitChars = "G123456789ABCDEF";
+        static readonly Dictionary<char, int> DigitVals = Utils.IndexMap("0123456789ABCDEF");
 
         static readonly HashSet<char> RawTokens = new HashSet<char>(" \t\n\r");
 
 
-        static readonly IEnumerable<string> ZeroNumber =
-            new string[] {
-                "punc.ndash",
-            };
+        static readonly IEnumerable<string> ZeroNumber = new[] { "num.0" };
 
         static readonly Dictionary<char, string> ToneMarkers =
             new Dictionary<char, string> {
@@ -371,15 +368,15 @@ namespace ConlangIME.InputMethods {
                 int nbase = DigitChars.Length;
                 int first = NumBuf.FindIndex(x => x > 0);
 
-                for(int i = NumBuf.Count - 1; i > first; i--) {
+                for(int i = NumBuf.Count - 1; i > first; i -= 1) {
                     if(NumBuf[i] > 0) continue;
-                    NumBuf[i - 1]--;
+                    NumBuf[i - 1] -= 1;
                     NumBuf[i] += nbase;
                 }
 
                 first = NumBuf.FindIndex(first, x => x > 0);
 
-                for(int i = first; i < NumBuf.Count; i++) {
+                for(int i = first; i < NumBuf.Count; i += 1) {
                     char ch = DigitChars[NumBuf[i] % nbase];
                     yield return Token.Sub($"num.{ch}");
                 }

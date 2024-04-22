@@ -16,10 +16,10 @@ namespace ConlangIME.Languages {
 
         const int FinalBase = 0xE000;
         const int InitBase = 0xE080;
-        const int IsolBase = 0xE220;
-        const int NumsBase = 0xE240;
-        const int PuncBase = 0xE250;
-        const int LogoBase = 0xE280;
+        const int IsolBase = 0xE230;
+        const int NumsBase = 0xE250;
+        const int PuncBase = 0xE270;
+        const int LogoBase = 0xE2A0;
 
         static readonly Dictionary<char, int> Final1Map = Utils.IndexMap("aeoöiuü");
         static readonly Dictionary<char, int> Final2Map = Utils.IndexMap("-iuümnlrfsšhptk");
@@ -28,7 +28,7 @@ namespace ConlangIME.Languages {
         static readonly Dictionary<char, int> Init2Map = Utils.IndexMap("-pbtdkgfvszšžhcčmnlry");
 
         static readonly Dictionary<char, int> IsolMap = Utils.IndexMap("aeoöiuüʔpbtdkgfvszšžhcčmnlry");
-        static readonly Dictionary<char, int> NumsMap = Utils.IndexMap("0123456789ABCDEF");
+        static readonly Dictionary<char, int> NumsMap = Utils.IndexMap("0123456789ABCDEFG");
 
         static readonly Dictionary<string, int> PuncMap = Utils.IndexMap(new[] {
             "nspace", "wspace", "period", "comma", "ndash", "wdash", "apost", "lquot",
