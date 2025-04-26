@@ -8,7 +8,8 @@ namespace ConlangIME.Languages
     [Language]
     public class Mwadengrukay : ILanguage
     {
-        static readonly FontFamily FontFamily = new(new Uri("pack://application:,,,/"), "./Fonts/#Mwadengrukay");
+        private static readonly FontFamily FontFamily =
+            new(new Uri("pack://application:,,,/"), "./Fonts/#Mwadengrukay");
 
         public string Name => "Mwadengrukay";
         public FontFamily Font => FontFamily;
