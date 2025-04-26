@@ -15,6 +15,7 @@
     <WarningLevel>4</WarningLevel>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <LangVersion>9</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -69,8 +70,10 @@
     <Compile Include="GUI\NumSpinner.xaml.cs">
       <DependentUpon>NumSpinner.xaml</DependentUpon>
     </Compile>
+    <Compile Include="InputMethods\MwadengRomV1.cs" />
     <Compile Include="InputMethods\SenkaliRomV1.cs" />
     <Compile Include="InputMethods\SenkaliRomV2.cs" />
+    <Compile Include="Languages\Mwadengrukay.cs" />
     <Compile Include="Languages\SenkalicuV2.cs" />
     <Compile Include="Languages\Senkalitcu\GlyphMap.cs" />
     <Compile Include="StringReaderEx.cs" />
@@ -128,6 +131,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Fonts\SenkalicuV2-Regular.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Fonts\Mwadengrukay-Regular.ttf" />
   </ItemGroup>
   <Import Project="..\Mijyuoon.MVVM.Base\Mijyuoon.MVVM.Base.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
