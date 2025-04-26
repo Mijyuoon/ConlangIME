@@ -106,18 +106,36 @@ namespace ConlangIME.InputMethods
             { '}', "par2rt" },
         };
 
+        private const string LetrPrefix = "letr";
+        private const string PuncPrefix = "punc";
+
         private const string MarkSupprVowel = "mark.cc";
         private const string MarkGeminated = "mark.gc";
 
         private const string NumberOpen = "punc.numlt";
         private const string NumberClose = "punc.numrt";
 
+        private static readonly HashSet<char> NumberChars = new("0123456789");
+
         private static readonly IEnumerable<string> NumberEmpty = new[]
         {
             NumberOpen, "punc.brk1", NumberClose,
         };
 
-        private static readonly HashSet<char> NumberDigits = new("0123456789");
+        private static readonly IEnumerable<(int, char)> NumberMajors = new[]
+        {
+            (30, 'u'), (24, 'o'), (18, 'i'), (12, 'e'), (6, 'a'), (0, Char.MinValue),
+        };
+
+        private static readonly IEnumerable<(int, char)> NumberMinors = new[]
+        {
+            (5, 'ñ'), (4, 'p'), (3, 'l'), (2, 'č'), (1, 'x'), (0, Char.MinValue),
+        };
+
+        private static readonly IReadOnlyList<char> NumberDigits = new List<char>
+        {
+            Char.MinValue, 'k', 'd', 'n', 'b', 't', 'ɣ', 'g', 'm', 'f', 'ž',
+        };
 
         static readonly HashSet<char> RawTokens = new(" \t\n\r");
 
@@ -134,8 +152,8 @@ namespace ConlangIME.InputMethods
 
                 if (SubDigraph.TryGetValue((c1, c2), out var cd))
                 {
-                    isr.Advance(1);
                     c1 = cd;
+                    isr.Advance(1);
                 }
                 else
                 {
@@ -178,7 +196,7 @@ namespace ConlangIME.InputMethods
 
                         if ((t2 & CharT.VowelA) != 0)
                         {
-                            // Skip the implied vowel
+                            // Skip the letter for the implied A vowel
                             return true;
                         }
 
@@ -191,19 +209,19 @@ namespace ConlangIME.InputMethods
                         return false;
                     });
 
-                    output = Token.Sub($"letr.{c1}");
+                    output = Token.Sub($"{LetrPrefix}.{c1}");
                     return true;
                 }
 
                 if ((t1 & CharT.Vowel) != 0)
                 {
-                    output = Token.Sub($"letr.{c1}");
+                    output = Token.Sub($"{LetrPrefix}.{c1}");
                     return true;
                 }
 
                 if ((t1 & CharT.Punc) != 0)
                 {
-                    output = Token.Sub($"punc.{Punctuation[c1]}");
+                    output = Token.Sub($"{PuncPrefix}.{Punctuation[c1]}");
                     return true;
                 }
 
@@ -215,12 +233,13 @@ namespace ConlangIME.InputMethods
 
         private IEnumerable<Token> ReadNumber(StringReaderEx isr)
         {
-            var numText = isr.ReadWhile(ch => NumberDigits.Contains(ch));
+            var numText = isr.ReadWhile(ch => NumberChars.Contains(ch));
             if (numText.Length == 0) return null;
 
             var number = BigInteger.Parse(numText);
-            if (number == BigInteger.Zero)
+            if (number.IsZero)
             {
+                // Special case for the zero
                 return NumberEmpty.Select(Token.Sub);
             }
 
@@ -228,7 +247,49 @@ namespace ConlangIME.InputMethods
             {
                 yield return Token.Sub(NumberOpen);
 
-                // TODO
+                // Major groups are every 10^6
+                var majMod = (BigInteger)1000000;
+
+                // Minor groups are every 10^1
+                var minMod = (BigInteger)10;
+
+                foreach (var (majPow, majCh) in NumberMajors)
+                {
+                    var majDiv = BigInteger.Pow(10, majPow);
+                    var majVal = number / majDiv % majMod;
+
+                    if (majVal.IsZero) continue;
+
+                    // Special case for 10^1 having a dedicated symbol
+                    if (majVal == minMod)
+                    {
+                        var digCh = NumberDigits[(int)majVal];
+                        yield return Token.Sub($"{LetrPrefix}.{digCh}");
+                    }
+                    else
+                    {
+                        foreach (var (minPow, minCh) in NumberMinors)
+                        {
+                            var minDiv = BigInteger.Pow(10, minPow);
+                            var minVal = majVal / minDiv % minMod;
+
+                            if (minVal.IsZero) continue;
+
+                            var digCh = NumberDigits[(int)minVal];
+                            if (digCh == Char.MinValue) continue;
+
+                            yield return Token.Sub($"{LetrPrefix}.{digCh}");
+
+                            if (minCh == Char.MinValue) continue;
+
+                            yield return Token.Sub($"{LetrPrefix}.{minCh}");
+                        }
+                    }
+
+                    if (majCh == Char.MinValue) continue;
+
+                    yield return Token.Sub($"{LetrPrefix}.{majCh}");
+                }
 
                 yield return Token.Sub(NumberClose);
             }
