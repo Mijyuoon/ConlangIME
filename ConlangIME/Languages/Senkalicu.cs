@@ -1,41 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace ConlangIME.Languages {
     [Language]
-    public class SenkalicuV2 : ILanguage {
-        static FontFamily FontFamily = new FontFamily(new Uri("pack://application:,,,/"), "./Fonts/#Senkalicu v2");
+    public class Senkalicu : ILanguage {
+        private static readonly FontFamily FontFamily =
+            new(new Uri("pack://application:,,,/"), "./Fonts/#Senkalicu");
 
-        public string Name => "Senkalicu v2";
+        public string Name => "Senkalicu";
         public FontFamily Font => FontFamily;
         public double FontSize => 27.0;
 
-        const int FinalBase = 0xE000;
-        const int InitBase = 0xE080;
-        const int IsolBase = 0xE230;
-        const int NumsBase = 0xE250;
-        const int PuncBase = 0xE270;
-        const int LogoBase = 0xE2A0;
+        private const int FinalBase = 0xE000;
+        private const int InitBase = 0xE080;
+        private const int IsolBase = 0xE230;
+        private const int NumsBase = 0xE250;
+        private const int PuncBase = 0xE270;
+        private const int LogoBase = 0xE2A0;
 
-        static readonly Dictionary<char, int> Final1Map = Utils.IndexMap("aeoöiuü");
-        static readonly Dictionary<char, int> Final2Map = Utils.IndexMap("-iuümnlrfsšhptk");
+        private static readonly Dictionary<char, int> Final1Map = Utils.IndexMap("aeoöiuü");
+        private static readonly Dictionary<char, int> Final2Map = Utils.IndexMap("-iuümnlrfsšhptk");
 
-        static readonly Dictionary<char, int> Init1Map = Utils.IndexMap("pbtdkgfvszšžhcčmnlry");
-        static readonly Dictionary<char, int> Init2Map = Utils.IndexMap("-pbtdkgfvszšžhcčmnlry");
+        private static readonly Dictionary<char, int> Init1Map = Utils.IndexMap("pbtdkgfvszšžhcčmnlry");
+        private static readonly Dictionary<char, int> Init2Map = Utils.IndexMap("-pbtdkgfvszšžhcčmnlry");
 
-        static readonly Dictionary<char, int> IsolMap = Utils.IndexMap("aeoöiuüʔpbtdkgfvszšžhcčmnlry");
-        static readonly Dictionary<char, int> NumsMap = Utils.IndexMap("0123456789ABCDEFG");
+        private static readonly Dictionary<char, int> IsolMap = Utils.IndexMap("aeoöiuüʔpbtdkgfvszšžhcčmnlry");
+        private static readonly Dictionary<char, int> NumsMap = Utils.IndexMap("0123456789ABCDEFG");
 
-        static readonly Dictionary<string, int> PuncMap = Utils.IndexMap(new[] {
+        private static readonly Dictionary<string, int> PuncMap = Utils.IndexMap(new[] {
             "nspace", "wspace", "period", "comma", "ndash", "wdash", "apost", "lquot",
             "rquot", "parstart", null, null, null, null, "tone2", "tone1",
         });
 
-        static readonly Dictionary<string, int> LogoMap = Utils.IndexMap(new[] {
+        private static readonly Dictionary<string, int> LogoMap = Utils.IndexMap(new[] {
             "num", "name", "time", "yes", "no",
         });
 

@@ -73,13 +73,10 @@
     <Compile Include="GUI\NumSpinner.xaml.cs">
       <DependentUpon>NumSpinner.xaml</DependentUpon>
     </Compile>
-    <Compile Include="InputMethods\MwadengRomV1.cs" />
     <Compile Include="InputMethods\MwadengRomV2.cs" />
-    <Compile Include="InputMethods\SenkaliRomV1.cs" />
     <Compile Include="InputMethods\SenkaliRomV2.cs" />
     <Compile Include="Languages\Mwadengrukay.cs" />
-    <Compile Include="Languages\SenkalicuV2.cs" />
-    <Compile Include="Languages\Senkalitcu\GlyphMap.cs" />
+    <Compile Include="Languages\Senkalicu.cs" />
     <Compile Include="StringReaderEx.cs" />
     <Compile Include="Utils.cs" />
     <Page Include="GUI\NumSpinner.xaml">
@@ -94,9 +91,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="InputMethods\SenkalitcuIPA.cs" />
     <Compile Include="Language.cs" />
-    <Compile Include="Languages\Senkalitcu.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -120,7 +115,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Resource Include="Fonts\Senkalitcu.ttf" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -134,10 +128,10 @@
     <Resource Include="AppIcon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Fonts\SenkalicuV2-Regular.ttf" />
+    <Resource Include="Fonts\Mwadengrukay-Regular.ttf" />
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="Fonts\Mwadengrukay-Regular.ttf" />
+    <Resource Include="Fonts\Senkalicu-Regular.ttf" />
   </ItemGroup>
   <Import Project="..\Mijyuoon.MVVM.Base\Mijyuoon.MVVM.Base.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -1,19 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
-using Mijyuoon.MVVM;
 
 namespace ConlangIME.GUI {
     public partial class NumSpinner : UserControl {
@@ -74,7 +61,7 @@ namespace ConlangIME.GUI {
         #region Property Events
 
         private static object Value_Coerce(DependencyObject d, object value) {
-            var sender = d as NumSpinner;
+            var sender = (NumSpinner)d;
             return Math.Min(Math.Max((int)value, sender.MinValue), sender.MaxValue);
         }
 
@@ -82,22 +69,22 @@ namespace ConlangIME.GUI {
             d.CoerceValue(MinValueProperty);
             d.CoerceValue(MaxValueProperty);
 
-            var sender = d as NumSpinner;
+            var sender = (NumSpinner)d;
             sender.txField.Text = $"{e.NewValue}{sender.Suffix}";
         }
 
         private static void MinValue_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            var sender = d as NumSpinner;
+            var sender = (NumSpinner)d;
             sender.Value = Math.Max(sender.Value, (int)e.NewValue);
         }
 
         private static void MaxValue_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            var sender = d as NumSpinner;
+            var sender = (NumSpinner)d;
             sender.Value = Math.Min(sender.Value, (int)e.NewValue);
         }
 
         private static void Suffix_Changed(DependencyObject d, DependencyPropertyChangedEventArgs e) {
-            var sender = d as NumSpinner;
+            var sender = (NumSpinner)d;
             sender.txField.Text = $"{sender.Value}{e.NewValue}";
         }
 

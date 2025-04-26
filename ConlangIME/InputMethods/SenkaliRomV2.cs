@@ -1,20 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Numerics;
 using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+
+using JetBrains.Annotations;
+
 using ConlangIME.Languages;
 
 namespace ConlangIME.InputMethods {
-    [InputMethod(typeof(SenkalicuV2))]
+    [UsedImplicitly]
+    [InputMethod(typeof(Senkalicu))]
     public class SenkaliRomV2 : IInputMethod {
         public string Name => "SenkaliRom v2";
 
         [Flags]
-        enum CharT {
+        private enum CharT {
             Null = 0,
 
             Cons  = 1 << 0, // Consonant (onset) token
@@ -33,8 +33,8 @@ namespace ConlangIME.InputMethods {
 
         #region Data Constants
 
-        static readonly Dictionary<char, CharT> CharTypes =
-            new Dictionary<char, CharT> {
+        private static readonly Dictionary<char, CharT> CharTypes =
+            new() {
                 // Vowel letters
                 { 'a', CharT.Vowel },
                 { 'e', CharT.Vowel },
@@ -138,8 +138,8 @@ namespace ConlangIME.InputMethods {
                 { '$', CharT.Punc },
             };
 
-        static readonly Dictionary<char, char> SubSingle =
-            new Dictionary<char, char> {
+        private static readonly Dictionary<char, char> SubSingle =
+            new() {
                 // Letters
                 { 'x', 'š' },
                 { 'X', 'Š' },
@@ -160,8 +160,8 @@ namespace ConlangIME.InputMethods {
                 { '"',  '”' },
             };
 
-        static readonly Dictionary<(char, char), char> SubDigraph =
-            new Dictionary<(char, char), char> {
+        private static readonly Dictionary<(char, char), char> SubDigraph =
+            new() {
                 // Letters
                 { ('e', 'o'), 'ö' },
                 { ('E', 'O'), 'Ö' },
@@ -185,8 +185,8 @@ namespace ConlangIME.InputMethods {
                 { ('^', '2'), '²' },
             };
 
-        static readonly Dictionary<char, string> Punctuation =
-            new Dictionary<char, string> {
+        private static readonly Dictionary<char, string> Punctuation =
+            new() {
                 // Base punctuation
                 { ' ',  "nspace" },
                 { '\t', "wspace" },
@@ -206,8 +206,8 @@ namespace ConlangIME.InputMethods {
                 { '²', "tone2" },
             };
 
-        static readonly Dictionary<string, string> Logograms =
-            new Dictionary<string, string> {
+        private static readonly Dictionary<string, string> Logograms =
+            new() {
                 // Punctuation based
                 { "#", "num"  },
                 { "@", "name" },
@@ -226,19 +226,18 @@ namespace ConlangIME.InputMethods {
             };
 
 
-        static readonly char LogogramStart = '\\';
-        static readonly HashSet<char> KeyChars = Utils.CharRanges("az", "AZ", "09");
+        private static readonly char LogogramStart = '\\';
+        private static readonly HashSet<char> KeyChars = Utils.CharRanges("az", "AZ", "09");
 
-        static readonly string DigitChars = "G123456789ABCDEF";
-        static readonly Dictionary<char, int> DigitVals = Utils.IndexMap("0123456789ABCDEF");
+        private static readonly string DigitChars = "G123456789ABCDEF";
+        private static readonly Dictionary<char, int> DigitVals = Utils.IndexMap("0123456789ABCDEF");
 
-        static readonly HashSet<char> RawTokens = new HashSet<char>(" \t\n\r");
+        private static readonly IEnumerable<string> ZeroNumber = new[] { "num.0" };
 
+        private static readonly HashSet<char> RawTokens = new(" \t\n\r");
 
-        static readonly IEnumerable<string> ZeroNumber = new[] { "num.0" };
-
-        static readonly Dictionary<char, string> ToneMarkers =
-            new Dictionary<char, string> {
+        private static readonly Dictionary<char, string> ToneMarkers =
+            new() {
                 { '\u0301', "punc.tone1" }, // COMBINING ACUTE ACCENT
                 { '\u030b', "punc.tone1" }, // COMBINING DOUBLE ACUTE ACCENT
                 { '\u0300', "punc.tone2" }, // COMBINING GRAVE ACCENT
@@ -247,14 +246,16 @@ namespace ConlangIME.InputMethods {
 
         #endregion
 
-        private Queue<Token> AuxTokens = new Queue<Token>(16);
+        private readonly Queue<Token> _auxTokens = new(16);
+
+        private readonly List<int> _numBuf = new(32);
 
         private void AuxExtractTone(ref char input) {
             var decomp = input.ToString().Normalize(NormalizationForm.FormD);
             if(decomp.Length != 2) throw new ArgumentException();
 
             var tone = ToneMarkers[decomp[1]];
-            AuxTokens.Enqueue(Token.Sub(tone));
+            _auxTokens.Enqueue(Token.Sub(tone));
             input = decomp[0];
         }
 
@@ -354,36 +355,34 @@ namespace ConlangIME.InputMethods {
             return output;
         }
 
-        private List<int> NumBuf = new List<int>(32);
-
         private IEnumerable<Token> ReadNumber(StringReaderEx isr) {
-            NumBuf.Clear();
+            _numBuf.Clear();
 
             while(DigitVals.TryGetValue(isr.Peek(1), out var dig)) {
                 isr.Advance(1);
-                NumBuf.Add(dig);
+                _numBuf.Add(dig);
             }
 
-            if(NumBuf.Count == 0) return null;
+            if(_numBuf.Count == 0) return null;
 
-            if(NumBuf.Sum() == 0) {
+            if(_numBuf.Sum() == 0) {
                 return ZeroNumber.Select(Token.Sub);
             }
 
             IEnumerable<Token> Generator() {
                 int nbase = DigitChars.Length;
-                int first = NumBuf.FindIndex(x => x > 0);
+                int first = _numBuf.FindIndex(x => x > 0);
 
-                for(int i = NumBuf.Count - 1; i > first; i -= 1) {
-                    if(NumBuf[i] > 0) continue;
-                    NumBuf[i - 1] -= 1;
-                    NumBuf[i] += nbase;
+                for(int i = _numBuf.Count - 1; i > first; i -= 1) {
+                    if(_numBuf[i] > 0) continue;
+                    _numBuf[i - 1] -= 1;
+                    _numBuf[i] += nbase;
                 }
 
-                first = NumBuf.FindIndex(first, x => x > 0);
+                first = _numBuf.FindIndex(first, x => x > 0);
 
-                for(int i = first; i < NumBuf.Count; i += 1) {
-                    char ch = DigitChars[NumBuf[i] % nbase];
+                for(int i = first; i < _numBuf.Count; i += 1) {
+                    char ch = DigitChars[_numBuf[i] % nbase];
                     yield return Token.Sub($"num.{ch}");
                 }
             }
@@ -414,27 +413,26 @@ namespace ConlangIME.InputMethods {
             var isr = new StringReaderEx(input);
 
             while(!isr.IsEOF) {
-                while(AuxTokens.Count > 0) {
-                    yield return AuxTokens.Dequeue();
+                while(_auxTokens.Count > 0) {
+                    yield return _auxTokens.Dequeue();
                 }
 
-                if(ReadToken(isr) is Token tok) {
+                if(ReadToken(isr) is {} tok) {
                     yield return tok;
                     continue;
                 }
 
-                if(ReadNumber(isr) is IEnumerable<Token> ntoks) {
-                    foreach(var ntok in ntoks)
-                        yield return ntok;
+                if(ReadNumber(isr) is {} nums) {
+                    foreach(var num in nums) yield return num;
                     continue;
                 }
 
-                if(ReadLogograph(isr) is Token ltok) {
-                    yield return ltok;
+                if(ReadLogograph(isr) is {} logo) {
+                    yield return logo;
                     continue;
                 }
 
-                string raw = isr.ReadWhile(ch => RawTokens.Contains(ch));
+                var raw = isr.ReadWhile(ch => RawTokens.Contains(ch));
                 if(raw.Length > 0) {
                     yield return Token.Raw(raw);
                     continue;
@@ -443,8 +441,8 @@ namespace ConlangIME.InputMethods {
                 isr.Advance(1);
             }
 
-            while(AuxTokens.Count > 0) {
-                yield return AuxTokens.Dequeue();
+            while(_auxTokens.Count > 0) {
+                yield return _auxTokens.Dequeue();
             }
         }
     }
