@@ -71,6 +71,7 @@
       <DependentUpon>NumSpinner.xaml</DependentUpon>
     </Compile>
     <Compile Include="InputMethods\MwadengRomV1.cs" />
+    <Compile Include="InputMethods\MwadengRomV2.cs" />
     <Compile Include="InputMethods\SenkaliRomV1.cs" />
     <Compile Include="InputMethods\SenkaliRomV2.cs" />
     <Compile Include="Languages\Mwadengrukay.cs" />
