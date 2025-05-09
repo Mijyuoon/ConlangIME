@@ -25,6 +25,7 @@ namespace ConlangIME.InputMethods
             Punc = 1 << 2,
 
             VowelA = 1 << 3,
+            Glide = 1 << 4,
         }
 
         #region Data Constants
@@ -55,9 +56,9 @@ namespace ConlangIME.InputMethods
             { 'n', CharT.Cons },
             { 'ñ', CharT.Cons },
             { 'ŋ', CharT.Cons },
-            { 'w', CharT.Cons },
+            { 'w', CharT.Cons | CharT.Glide },
             { 'r', CharT.Cons },
-            { 'y', CharT.Cons },
+            { 'y', CharT.Cons | CharT.Glide },
             { 'l', CharT.Cons },
 
             { ',', CharT.Punc },
@@ -67,6 +68,7 @@ namespace ConlangIME.InputMethods
             { ')', CharT.Punc },
             { '{', CharT.Punc },
             { '}', CharT.Punc },
+            { '_', CharT.Punc },
         };
 
         private static readonly Dictionary<char, char> SubSingle = new()
@@ -104,6 +106,7 @@ namespace ConlangIME.InputMethods
             { ')', "par1rt" },
             { '{', "par2lt" },
             { '}', "par2rt" },
+            { '_', "empty" },
         };
 
         private const string LetrPrefix = "letr";

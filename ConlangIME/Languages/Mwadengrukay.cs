@@ -28,7 +28,7 @@ namespace ConlangIME.Languages
 
         private static readonly Dictionary<string, int> PunctMap = Utils.IndexMap(new[]
         {
-            "brk1", "brk2", "list", "numlt", "numrt", "par1lt", "par1rt", "par2lt", "par2rt",
+            "brk1", "brk2", "list", "numlt", "numrt", "par1lt", "par1rt", "par2lt", "par2rt", "empty",
         });
 
         public string Process(IEnumerable<Token> tokens)
