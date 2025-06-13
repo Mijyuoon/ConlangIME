@@ -114,6 +114,7 @@ namespace ConlangIME.InputMethods
 
         private const string MarkSupprVowel = "mark.cc";
         private const string MarkGeminated = "mark.gc";
+        private const string MarkLongVowel = "mark.aa";
 
         private const string NumberOpen = "punc.numlt";
         private const string NumberClose = "punc.numrt";
@@ -199,6 +200,17 @@ namespace ConlangIME.InputMethods
 
                         if ((t2 & CharT.VowelA) != 0)
                         {
+                            isr.Backtrack(() =>
+                            {
+                                var (_, t3) = ReadChar();
+                                if ((t3 & CharT.VowelA) == 0) return false;
+
+                                // Add a long vowel mark for the implied A vowel
+                                _auxTokens.Enqueue(Token.Sub(MarkLongVowel));
+
+                                return true;
+                            });
+
                             // Skip the letter for the implied A vowel
                             return true;
                         }
@@ -218,6 +230,22 @@ namespace ConlangIME.InputMethods
 
                 if ((t1 & CharT.Vowel) != 0)
                 {
+                    isr.Backtrack(() =>
+                    {
+                        var (c2, t2) = ReadChar();
+                        if ((t2 & CharT.Vowel) == 0) return false;
+
+                        if (c1 == c2)
+                        {
+                            // Add a gemination mark for other long vowels
+                            _auxTokens.Enqueue(Token.Sub(MarkGeminated));
+
+                            return true;
+                        }
+
+                        return false;
+                    });
+
                     output = Token.Sub($"{LetrPrefix}.{c1}");
                     return true;
                 }

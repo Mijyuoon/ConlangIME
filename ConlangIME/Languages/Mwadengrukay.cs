@@ -23,7 +23,7 @@ namespace ConlangIME.Languages
 
         private static readonly Dictionary<string, int> MarksMap = Utils.IndexMap(new[]
         {
-            null, null, null, "cc", "gc",
+            null, null, "aa", "cc", "gc",
         });
 
         private static readonly Dictionary<string, int> PunctMap = Utils.IndexMap(new[]
