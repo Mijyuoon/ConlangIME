@@ -3,9 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConlangIME", "ConlangIME\ConlangIME.csproj", "{D8CA0AF1-743C-4206-AC2D-94D3628A723C}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Mijyuoon.MVVM.Base", "Mijyuoon.MVVM.Base\Mijyuoon.MVVM.Base.shproj", "{AD188FD6-7D7F-467C-892F-7FEC66AA46A5}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConlangIME", "ConlangIME\ConlangIME.csproj", "{2904C7A5-6342-4788-8936-6179D036DDE5}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -17,10 +15,10 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D8CA0AF1-743C-4206-AC2D-94D3628A723C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D8CA0AF1-743C-4206-AC2D-94D3628A723C}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D8CA0AF1-743C-4206-AC2D-94D3628A723C}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D8CA0AF1-743C-4206-AC2D-94D3628A723C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2904C7A5-6342-4788-8936-6179D036DDE5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2904C7A5-6342-4788-8936-6179D036DDE5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2904C7A5-6342-4788-8936-6179D036DDE5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2904C7A5-6342-4788-8936-6179D036DDE5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
