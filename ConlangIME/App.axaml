@@ -1,0 +1,19 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ConlangIME.App"
+             xmlns:local="using:ConlangIME"
+             RequestedThemeVariant="Default">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+  
+    <Application.Styles>
+        <FluentTheme/>
+    </Application.Styles>
+
+    <Application.Resources>
+        <FontFamily x:Key="Font:Senkalicu">avares://ConlangIME/Assets/Fonts#Senkalicu</FontFamily>
+        <FontFamily x:Key="Font:Mwadengrukay">avares://ConlangIME/Assets/Fonts#Mwadengrukay</FontFamily>
+    </Application.Resources>
+</Application>

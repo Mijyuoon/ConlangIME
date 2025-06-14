@@ -1,0 +1,85 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ConlangIME.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ui="using:ConlangIME.Views.Components"
+        mc:Ignorable="d" d:DesignWidth="900" d:DesignHeight="550"
+        x:Class="ConlangIME.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="900" Height="550"
+        WindowStartupLocation="CenterScreen"
+        Title="Mijyuoon’s Conlang IME"
+        Icon="/Assets/AppIcon.ico">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,5" Orientation="Horizontal">
+            <TextBlock Margin="0,0,5,0" VerticalAlignment="Center" Text="Language:"/>
+
+            <ComboBox Margin="0,0,5,0" MinWidth="100"
+                      ItemsSource="{Binding Languages}"
+                      SelectedItem="{Binding ActiveLanguage, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBlock Margin="0,0,5,0" VerticalAlignment="Center" Text="Input Method:"/>
+
+            <ComboBox Margin="0,0,5,0" MinWidth="100"
+                      ItemsSource="{Binding InputMethods}"
+                      SelectedItem="{Binding ActiveInputMethod, Mode=TwoWay}">
+                <ComboBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}"/>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+
+            <TextBlock Margin="0,0,5,0" VerticalAlignment="Center" Text="Font Scale:"/>
+
+            <ui:NumSpinner Margin="0,0,5,0" MinWidth="80"
+                           Minimum="50" Maximum="200" Increment="10" Suffix="%"
+                           Value="{Binding FontScale, Mode=TwoWay}"/>
+        </StackPanel>
+
+        <TextBox Grid.Row="1" AcceptsReturn="True" TextWrapping="WrapWithOverflow"
+                 Text="{Binding InputText, Mode=TwoWay}"/>
+
+        <GridSplitter Grid.Row="2" HorizontalAlignment="Stretch" Height="5"/>
+
+        <TextBox Grid.Row="3" IsReadOnly="True" TextWrapping="WrapWithOverflow"
+                 Text="{Binding OutputText}"
+                 FontFamily="{Binding OutputFontFamily}"
+                 FontSize="{Binding OutputFontSize}">
+            <TextBox.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Copy Unicode Codepoints">
+                        <MenuItem Header="Single Line" CommandParameter="0"
+                                  Command="{Binding CopyOutputUnicodeCommand}"/>
+                        <MenuItem Header="Chunked (8)" CommandParameter="8"
+                                  Command="{Binding CopyOutputUnicodeCommand}"/>
+                        <MenuItem Header="Chunked (16)" CommandParameter="16"
+                                  Command="{Binding CopyOutputUnicodeCommand}"/>
+                        <MenuItem Header="Chunked (24)" CommandParameter="24"
+                                  Command="{Binding CopyOutputUnicodeCommand}"/>
+                    </MenuItem>
+                </ContextMenu>
+            </TextBox.ContextMenu>
+        </TextBox>
+    </Grid>
+
+</Window>
