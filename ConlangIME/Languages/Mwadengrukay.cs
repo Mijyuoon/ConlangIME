@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 
-using Avalonia;
 using Avalonia.Media;
 
 using ConlangIME.Core;
@@ -18,6 +17,9 @@ public class Mwadengrukay : ILanguage
     public string Name => "Mwadengrukay";
     public FontFamily Font => FontFamily;
     public double FontSize => 27.0;
+
+    private const int ZeroWidthJoiner = 0x200D;
+    private const int ZeroWidthNonJoiner = 0x200C;
 
     private const int LetterBase = 0xE000;
     private const int MarksBase = 0xE01B;
@@ -47,14 +49,13 @@ public class Mwadengrukay : ILanguage
                 continue;
             }
 
-            var par = tk.Value.Split('.');
-            var (type, par1) = (par[0], par[1]);
-
-            sb.Append(type switch
+            sb.Append(tk.Value.Split('.') switch
             {
-                "letr" => (char)(LetterBase + LetterMap[par1[0]]),
-                "mark" => (char)(MarksBase + MarksMap[par1]),
-                "punc" => (char)(PunctBase + PunctMap[par1]),
+                ["letr", var par1] => (char)(LetterBase + LetterMap[par1[0]]),
+                ["mark", var par1] => (char)(MarksBase + MarksMap[par1]),
+                ["punc", var par1] => (char)(PunctBase + PunctMap[par1]),
+                ["join", "1"] => (char)ZeroWidthJoiner,
+                ["join", "0"] => (char)ZeroWidthNonJoiner,
                 _ => throw new FormatException("invalid token type"),
             });
         }

@@ -17,6 +17,9 @@ public class MwadengRomV2 : IInputMethod
 {
     public string Name => "MwadengRom v2";
 
+    [InputMethodFlag("Vowel Ligatures")]
+    public bool VowelLigatures { get; set; } = false;
+
     [Flags]
     private enum CharT
     {
@@ -111,6 +114,9 @@ public class MwadengRomV2 : IInputMethod
         { '_', "empty" },
     };
 
+    private const string Joiner = "join.1";
+    private const string NonJoiner = "join.0";
+
     private const string LetrPrefix = "letr";
     private const string PuncPrefix = "punc";
 
@@ -147,9 +153,7 @@ public class MwadengRomV2 : IInputMethod
 
     #endregion
 
-    private readonly Queue<Token> _auxTokens = new(16);
-
-    private Token? ReadToken(StringReaderEx isr)
+    private IEnumerable<Token>? ReadLetters(StringReaderEx isr)
     {
         (char, CharT) ReadChar()
         {
@@ -169,14 +173,19 @@ public class MwadengRomV2 : IInputMethod
             return (c1, CharTypes.GetValueOrDefault(c1, CharT.Null));
         }
 
-        Token? output = null;
+        List<Token>? result = null;
 
         isr.Backtrack(() =>
         {
             var (c1, t1) = ReadChar();
+            if (t1 == CharT.Null) return false;
+
+            result = new List<Token>(capacity: 6);
 
             if ((t1 & CharT.Cons) != 0)
             {
+                result.Add(Token.Sub($"{LetrPrefix}.{c1}"));
+
                 isr.Backtrack(() =>
                 {
                     var (c2, t2) = ReadChar();
@@ -184,12 +193,13 @@ public class MwadengRomV2 : IInputMethod
 
                     if (c1 == c2 || GemDigraph.Contains((c1, c2)))
                     {
-                        // Add a consonant gemination mark
-                        _auxTokens.Enqueue(Token.Sub(MarkGeminated));
+                        result.Add(Token.Sub(MarkGeminated));
+                        return true;
+                    }
 
-                        // The correct consonant is always the second one
-                        c1 = c2;
-
+                    if ((t2 & CharT.Glide) != 0 && (t1 & CharT.Glide) == 0)
+                    {
+                        result.Add(Token.Sub($"{LetrPrefix}.{c2}"));
                         return true;
                     }
 
@@ -198,40 +208,44 @@ public class MwadengRomV2 : IInputMethod
 
                 isr.Backtrack(() =>
                 {
-                    var (_, t2) = ReadChar();
+                    var (c2, t2) = ReadChar();
 
-                    if ((t2 & CharT.VowelA) != 0)
+                    if ((t2 & CharT.Vowel) == 0)
+                    {
+                        result.Add(Token.Sub(MarkSupprVowel));
+                    }
+                    else if ((t2 & CharT.VowelA) != 0)
                     {
                         isr.Backtrack(() =>
                         {
                             var (_, t3) = ReadChar();
                             if ((t3 & CharT.VowelA) == 0) return false;
 
-                            // Add a long vowel mark for the implied A vowel
-                            _auxTokens.Enqueue(Token.Sub(MarkLongVowel));
-
+                            result.Add(Token.Sub(MarkLongVowel));
                             return true;
                         });
 
-                        // Skip the letter for the implied A vowel
-                        return true;
-                    }
+                        isr.Backtrack(() =>
+                        {
+                            var (_, t3) = ReadChar();
+                            if ((t3 & CharT.Glide) == 0) return false;
 
-                    if ((t2 & CharT.Vowel) == 0)
-                    {
-                        // Add a vowel suppressor mark if what follows is not a vowel
-                        _auxTokens.Enqueue(Token.Sub(MarkSupprVowel));
+                            result.Add(Token.Sub(NonJoiner));
+                            return false;
+                        });
+
+                        return true;
                     }
 
                     return false;
                 });
-
-                output = Token.Sub($"{LetrPrefix}.{c1}");
-                return true;
             }
-
-            if ((t1 & CharT.Vowel) != 0)
+            else if ((t1 & CharT.Vowel) != 0)
             {
+                result.Add(Token.Sub($"{LetrPrefix}.{c1}"));
+
+                bool longVowel = false;
+
                 isr.Backtrack(() =>
                 {
                     var (c2, t2) = ReadChar();
@@ -239,32 +253,56 @@ public class MwadengRomV2 : IInputMethod
 
                     if (c1 == c2)
                     {
-                        // Add a gemination mark for other long vowels
-                        _auxTokens.Enqueue(Token.Sub(MarkGeminated));
-
+                        longVowel = true;
                         return true;
                     }
 
                     return false;
                 });
 
-                output = Token.Sub($"{LetrPrefix}.{c1}");
-                return true;
-            }
+                if (VowelLigatures)
+                {
+                    isr.Backtrack(() =>
+                    {
+                        var (c2, t2) = ReadChar();
+                        if ((t2 & CharT.Glide) == 0) return false;
 
-            if ((t1 & CharT.Punc) != 0)
+                        var sameSyllable = true;
+
+                        isr.Backtrack(() =>
+                        {
+                            var (_, t3) = ReadChar();
+                            if ((t3 & CharT.Vowel) == 0) return false;
+
+                            sameSyllable = false;
+                            return false;
+                        });
+
+                        if (!sameSyllable) return false;
+
+                        result.Add(Token.Sub(Joiner));
+                        result.Add(Token.Sub($"{LetrPrefix}.{c2}"));
+                        return true;
+                    });
+                }
+
+                if (longVowel)
+                {
+                    result.Add(Token.Sub(MarkGeminated));
+                }
+            }
+            else if ((t1 & CharT.Punc) != 0)
             {
-                output = Token.Sub($"{PuncPrefix}.{Punctuation[c1]}");
-                return true;
+                result.Add(Token.Sub($"{PuncPrefix}.{Punctuation[c1]}"));
             }
 
-            return false;
+            return true;
         });
 
-        return output;
+        return result;
     }
 
-    private IEnumerable<Token>? ReadNumber(StringReaderEx isr)
+    private IEnumerable<Token>? ReadNumbers(StringReaderEx isr)
     {
         var numText = isr.ReadWhile(ch => NumberChars.Contains(ch));
         if (numText.Length == 0) return null;
@@ -276,58 +314,55 @@ public class MwadengRomV2 : IInputMethod
             return NumberEmpty.Select(Token.Sub);
         }
 
-        IEnumerable<Token> Generator()
+        var result = new List<Token>(capacity: 14);
+        result.Add(Token.Sub(NumberOpen));
+
+        // Major groups are every 10^6
+        var majMod = (BigInteger)1000000;
+
+        // Minor groups are every 10^1
+        var minMod = (BigInteger)10;
+
+        foreach (var (majPow, majCh) in NumberMajors)
         {
-            yield return Token.Sub(NumberOpen);
+            var majDiv = BigInteger.Pow(10, majPow);
+            var majVal = number / majDiv % majMod;
 
-            // Major groups are every 10^6
-            var majMod = (BigInteger)1000000;
+            if (majVal.IsZero) continue;
 
-            // Minor groups are every 10^1
-            var minMod = (BigInteger)10;
-
-            foreach (var (majPow, majCh) in NumberMajors)
+            // Special case for 10^1 having a dedicated symbol
+            if (majVal == minMod)
             {
-                var majDiv = BigInteger.Pow(10, majPow);
-                var majVal = number / majDiv % majMod;
-
-                if (majVal.IsZero) continue;
-
-                // Special case for 10^1 having a dedicated symbol
-                if (majVal == minMod)
+                var digCh = NumberDigits[(int)majVal];
+                result.Add(Token.Sub($"{LetrPrefix}.{digCh}"));
+            }
+            else
+            {
+                foreach (var (minPow, minCh) in NumberMinors)
                 {
-                    var digCh = NumberDigits[(int)majVal];
-                    yield return Token.Sub($"{LetrPrefix}.{digCh}");
+                    var minDiv = BigInteger.Pow(10, minPow);
+                    var minVal = majVal / minDiv % minMod;
+
+                    if (minVal.IsZero) continue;
+
+                    var digCh = NumberDigits[(int)minVal];
+                    if (digCh == Char.MinValue) continue;
+
+                    result.Add(Token.Sub($"{LetrPrefix}.{digCh}"));
+
+                    if (minCh == Char.MinValue) continue;
+
+                    result.Add(Token.Sub($"{LetrPrefix}.{minCh}"));
                 }
-                else
-                {
-                    foreach (var (minPow, minCh) in NumberMinors)
-                    {
-                        var minDiv = BigInteger.Pow(10, minPow);
-                        var minVal = majVal / minDiv % minMod;
-
-                        if (minVal.IsZero) continue;
-
-                        var digCh = NumberDigits[(int)minVal];
-                        if (digCh == Char.MinValue) continue;
-
-                        yield return Token.Sub($"{LetrPrefix}.{digCh}");
-
-                        if (minCh == Char.MinValue) continue;
-
-                        yield return Token.Sub($"{LetrPrefix}.{minCh}");
-                    }
-                }
-
-                if (majCh == Char.MinValue) continue;
-
-                yield return Token.Sub($"{LetrPrefix}.{majCh}");
             }
 
-            yield return Token.Sub(NumberClose);
+            if (majCh == Char.MinValue) continue;
+
+            result.Add(Token.Sub($"{LetrPrefix}.{majCh}"));
         }
 
-        return Generator();
+        result.Add(Token.Sub(NumberClose));
+        return result;
     }
 
     public IEnumerable<Token> Tokenize(string input)
@@ -336,19 +371,15 @@ public class MwadengRomV2 : IInputMethod
 
         while (!isr.IsEOF)
         {
-            while(_auxTokens.Count > 0) {
-                yield return _auxTokens.Dequeue();
-            }
-
-            if (ReadNumber(isr) is {} nums)
+            if (ReadNumbers(isr) is {} numbers)
             {
-                foreach (var num in nums) yield return num;
+                foreach (var tok in numbers) yield return tok;
                 continue;
             }
 
-            if (ReadToken(isr) is {} tok)
+            if (ReadLetters(isr) is {} letters)
             {
-                yield return tok;
+                foreach (var tok in letters) yield return tok;
                 continue;
             }
 
@@ -360,11 +391,6 @@ public class MwadengRomV2 : IInputMethod
             }
 
             isr.Advance(1);
-        }
-
-        while (_auxTokens.Count > 0)
-        {
-            yield return _auxTokens.Dequeue();
         }
     }
 }

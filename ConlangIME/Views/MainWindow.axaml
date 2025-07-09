@@ -54,6 +54,22 @@
             <ui:NumSpinner Margin="0,0,5,0" MinWidth="80"
                            Minimum="50" Maximum="200" Increment="10" Suffix="%"
                            Value="{Binding FontScale, Mode=TwoWay}"/>
+
+            <ItemsControl Margin="0,0,5,0"
+                          ItemsSource="{Binding InputMethodFlags}">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Spacing="5" Orientation="Horizontal"/>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <ToggleButton Padding="5"
+                                      Content="{Binding Label}"
+                                      IsChecked="{Binding Value}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
         </StackPanel>
 
         <TextBox Grid.Row="1" AcceptsReturn="True" TextWrapping="WrapWithOverflow"

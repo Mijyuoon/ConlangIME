@@ -20,6 +20,7 @@ public partial class MainWindow : Window
         _viewModel.LanguageSelected += OnLanguageSelected;
         _viewModel.InputMethodSelected += OnInputMethodSelected;
         _viewModel.InputChanged += OnInputChanged;
+        _viewModel.InputMethodFlagsChanged += OnInputMethodFlagsChanged;
         _viewModel.OutputUnicodeCopied += OnOutputUnicodeCopied;
 
         _viewModel.Languages = LanguageRegistry.GetLanguages();
@@ -30,10 +31,12 @@ public partial class MainWindow : Window
         _viewModel.InputMethods = LanguageRegistry.GetInputMethods(language);
     }
 
-    private void OnInputMethodSelected(object? sender, IInputMethod _)
+    private void OnInputMethodSelected(object? sender, IInputMethod inputMethod)
     {
+        _viewModel.InputMethodFlags = LanguageRegistry.GetInputMethodFlags(inputMethod);
+
         // Refresh the output when the input method changes
-        _viewModel.OutputText = ComputeOutputText(_viewModel.InputText);
+        _viewModel.OutputText = ComputeOutputText();
     }
 
     private void OnInputChanged(object? sender, string input)
@@ -41,13 +44,21 @@ public partial class MainWindow : Window
         _viewModel.OutputText = ComputeOutputText(input);
     }
 
+    private void OnInputMethodFlagsChanged(object? sender, EventArgs e)
+    {
+        // Refresh the output when the input method flags change
+        _viewModel.OutputText = ComputeOutputText();
+    }
+
     private async void OnOutputUnicodeCopied(object? sender, (string Text, int WrapAtColumn) e)
     {
         await Clipboard!.SetTextAsync(FormatUnicodeCodepoints(e.Text, e.WrapAtColumn));
     }
 
-    private string ComputeOutputText(string input)
+    private string ComputeOutputText(string? input = null)
     {
+        input ??= _viewModel.InputText;
+
         var tokens = _viewModel.ActiveInputMethod?.Tokenize(input);
         if (tokens is null) return String.Empty;
 

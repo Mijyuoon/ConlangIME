@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Input;
@@ -14,8 +15,9 @@ namespace ConlangIME.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private IReadOnlyList<ILanguage> _languages = new List<ILanguage>();
-    private IReadOnlyList<IInputMethod> _inputMethods = new List<IInputMethod>();
+    private IReadOnlyList<ILanguage> _languages = ReadOnlyObservableCollection<ILanguage>.Empty;
+    private IReadOnlyList<IInputMethod> _inputMethods = ReadOnlyCollection<IInputMethod>.Empty;
+    private IReadOnlyList<IInputMethodFlag> _inputMethodFlags = ReadOnlyCollection<IInputMethodFlag>.Empty;
 
     private ILanguage? _activeLanguage = default;
     private IInputMethod? _activeInputMethod = default;
@@ -27,6 +29,7 @@ public class MainWindowViewModel : ViewModelBase
 
     public event EventHandler<ILanguage>? LanguageSelected;
     public event EventHandler<IInputMethod>? InputMethodSelected;
+    public event EventHandler? InputMethodFlagsChanged;
 
     public event EventHandler<string>? InputChanged;
     public event EventHandler<(string Text, int WrapAtColumn)>? OutputUnicodeCopied;
@@ -41,6 +44,12 @@ public class MainWindowViewModel : ViewModelBase
     {
         get => _inputMethods;
         set => SetProperty(ref _inputMethods, value);
+    }
+
+    public IReadOnlyList<IInputMethodFlag> InputMethodFlags
+    {
+        get => _inputMethodFlags;
+        set => SetProperty(ref _inputMethodFlags, value);
     }
 
     public ILanguage? ActiveLanguage
@@ -121,6 +130,22 @@ public class MainWindowViewModel : ViewModelBase
             case nameof(InputText):
                 OnInputTextChanged();
                 break;
+
+            case nameof(InputMethodFlags):
+                OnInputMethodFlagsChanged(true);
+                break;
+        }
+    }
+
+    protected override void OnPropertyChanging(PropertyChangingEventArgs e)
+    {
+        base.OnPropertyChanging(e);
+
+        switch (e.PropertyName)
+        {
+            case nameof(InputMethodFlags):
+                OnInputMethodFlagsChanged(false);
+                break;
         }
     }
 
@@ -155,9 +180,31 @@ public class MainWindowViewModel : ViewModelBase
         InputChanged?.Invoke(this, InputText);
     }
 
+    private void OnInputMethodFlagsChanged(bool isAdding)
+    {
+        foreach (var flag in InputMethodFlags)
+        {
+            if (isAdding)
+            {
+                flag.PropertyChanged += InputMethodFlag_OnPropertyChanged;
+            }
+            else
+            {
+                flag.PropertyChanged -= InputMethodFlag_OnPropertyChanged;
+            }
+        }
+    }
+
     private void OnCopyOutputUnicode(string? param)
     {
         var wrap = Int32.TryParse(param, out var result) ? result : default;
         OutputUnicodeCopied?.Invoke(this, (Text: OutputText, WrapAtColumn: wrap));
+    }
+
+    private void InputMethodFlag_OnPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(IInputMethodFlag.Value)) return;
+
+        InputMethodFlagsChanged?.Invoke(this, EventArgs.Empty);
     }
 }
