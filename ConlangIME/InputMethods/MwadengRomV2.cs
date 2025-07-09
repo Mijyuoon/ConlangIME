@@ -184,21 +184,23 @@ public class MwadengRomV2 : IInputMethod
 
             if ((t1 & CharT.Cons) != 0)
             {
-                result.Add(Token.Sub($"{LetrPrefix}.{c1}"));
-
-                isr.Backtrack(() =>
+                var skipConsonant = isr.Backtrack(() =>
                 {
                     var (c2, t2) = ReadChar();
                     if ((t2 & CharT.Cons) == 0) return false;
 
                     if (c1 == c2 || GemDigraph.Contains((c1, c2)))
                     {
+                        // For geminates the correct consonant is always the second one
+                        result.Add(Token.Sub($"{LetrPrefix}.{c2}"));
                         result.Add(Token.Sub(MarkGeminated));
                         return true;
                     }
 
                     if ((t2 & CharT.Glide) != 0 && (t1 & CharT.Glide) == 0)
                     {
+                        // Add both parts of a consonant-glide ligature
+                        result.Add(Token.Sub($"{LetrPrefix}.{c1}"));
                         result.Add(Token.Sub($"{LetrPrefix}.{c2}"));
                         return true;
                     }
@@ -206,12 +208,19 @@ public class MwadengRomV2 : IInputMethod
                     return false;
                 });
 
+                if (!skipConsonant)
+                {
+                    // Add the single consonant if this isn't a special case
+                    result.Add(Token.Sub($"{LetrPrefix}.{c1}"));
+                }
+
                 isr.Backtrack(() =>
                 {
                     var (c2, t2) = ReadChar();
 
                     if ((t2 & CharT.Vowel) == 0)
                     {
+                        // Add the vowel suppressor diacritic if this consonant isn't followed by a vowel
                         result.Add(Token.Sub(MarkSupprVowel));
                     }
                     else if ((t2 & CharT.VowelA) != 0)
@@ -221,6 +230,7 @@ public class MwadengRomV2 : IInputMethod
                             var (_, t3) = ReadChar();
                             if ((t3 & CharT.VowelA) == 0) return false;
 
+                            // Add the diacritic for an implied long A vowel
                             result.Add(Token.Sub(MarkLongVowel));
                             return true;
                         });
@@ -230,6 +240,7 @@ public class MwadengRomV2 : IInputMethod
                             var (_, t3) = ReadChar();
                             if ((t3 & CharT.Glide) == 0) return false;
 
+                            // Add a non-joiner if the next letter would form an unwanted ligature
                             result.Add(Token.Sub(NonJoiner));
                             return false;
                         });
@@ -253,6 +264,8 @@ public class MwadengRomV2 : IInputMethod
 
                     if (c1 == c2)
                     {
+                        // Cannot emit the long A vowel diacritic immediately
+                        // As it would prevent vowel-glide ligatures from forming
                         longVowel = true;
                         return true;
                     }
@@ -274,10 +287,12 @@ public class MwadengRomV2 : IInputMethod
                             var (_, t3) = ReadChar();
                             if ((t3 & CharT.Vowel) == 0) return false;
 
+                            // Check if this glide belongs to the same syllable as the preceding vowel
                             sameSyllable = false;
                             return false;
                         });
 
+                        // Do not add a joiner if this glide belongs to the next syllable
                         if (!sameSyllable) return false;
 
                         result.Add(Token.Sub(Joiner));
@@ -288,6 +303,7 @@ public class MwadengRomV2 : IInputMethod
 
                 if (longVowel)
                 {
+                    // Add the long A vowel diacritic at the end
                     result.Add(Token.Sub(MarkGeminated));
                 }
             }
